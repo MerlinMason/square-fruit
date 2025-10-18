@@ -21,7 +21,7 @@ type RewardGalleryProps = {
 };
 
 // Constants
-const ALL_REWARD_IMAGES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+export const ALL_REWARD_IMAGES = Array.from({ length: 12 }, (_, i) => i + 1);
 const THUMBNAIL_ASPECT_RATIO = "12.8/9";
 
 export default function RewardGallery({

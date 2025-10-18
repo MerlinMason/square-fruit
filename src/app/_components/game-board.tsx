@@ -3,11 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
+import { ALL_REWARD_IMAGES } from "./reward-gallery";
 
 type OperationMode = "addition" | "subtraction" | "multiplication" | "all";
 
 // Constants
-const REWARD_IMAGES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const CELEBRATION_DELAY = 600;
 
 type Square = {
@@ -93,13 +93,13 @@ export default function GameBoard({
 	// Select background image on mount - prioritize unseen images
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Only run once on mount to keep image stable
 	useEffect(() => {
-		const unseenImages = REWARD_IMAGES.filter(
+		const unseenImages = ALL_REWARD_IMAGES.filter(
 			(num) => !unlockedImages.includes(num),
 		);
 
 		// If there are unseen images, pick one of those. Otherwise pick random.
 		const availableImages =
-			unseenImages.length > 0 ? unseenImages : REWARD_IMAGES;
+			unseenImages.length > 0 ? unseenImages : ALL_REWARD_IMAGES;
 		const chosenNumber =
 			availableImages[randomInt(0, availableImages.length - 1)] ?? 1;
 
@@ -219,12 +219,6 @@ export default function GameBoard({
 		multiplication: "✖️",
 	};
 
-	const operationEmoji = {
-		addition: "🌸",
-		subtraction: "🦋",
-		multiplication: "⭐",
-	};
-
 	// Get selected values for display
 	const selectedValues = selectedSquares.map(
 		(id) => board.find((sq) => sq.id === id)?.value,
@@ -252,7 +246,7 @@ export default function GameBoard({
 								<span className="animation-delay-800 animate-bounce">🦄</span>
 							</div>
 							<p className="font-bold text-2xl text-purple-600">
-								Amazing work, Math Genius! 🌈
+								🌈 Amazing work! 🌈
 							</p>
 							<Button
 								onClick={onRestart}
