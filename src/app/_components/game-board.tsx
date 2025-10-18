@@ -3,6 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
+import CompletionScreen from "./completion-screen";
+import EquationDisplay from "./equation-display";
 import { ALL_REWARD_IMAGES } from "./reward-gallery";
 
 type OperationMode = "addition" | "subtraction" | "multiplication" | "all";
@@ -252,12 +254,6 @@ export default function GameBoard({
     }
   };
 
-  const operationSymbol = {
-    addition: "➕",
-    subtraction: "➖",
-    multiplication: "✖️",
-  };
-
   // Get selected values for display
   const selectedValues = selectedSquares.map((id) => board.find((sq) => sq.id === id)?.value);
   const firstValue = selectedValues[0];
@@ -268,32 +264,7 @@ export default function GameBoard({
       {/* Left Sidebar - Target Display / Completion Message */}
       <Card className="relative flex min-w-0 flex-col overflow-auto border-4 border-pink-300 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-3 text-center shadow-xl sm:p-4 md:self-start lg:col-span-4 lg:flex-1 lg:p-6">
         {isComplete ? (
-          <>
-            {/* Completion State */}
-            <div className="space-y-3 sm:space-y-4">
-              <div className="text-6xl sm:text-8xl">🎉</div>
-              <div className="animate-pulse bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text font-bold text-3xl text-transparent sm:text-5xl">
-                You Did It!
-              </div>
-              <div className="flex justify-center gap-2 text-3xl sm:text-4xl">
-                <span className="animate-bounce">⭐</span>
-                <span className="animation-delay-200 animate-bounce">✨</span>
-                <span className="animation-delay-400 animate-bounce">🌟</span>
-                <span className="animation-delay-600 animate-bounce">💖</span>
-                <span className="animation-delay-800 animate-bounce">🦄</span>
-              </div>
-              <p className="font-bold text-purple-600 text-xl sm:text-2xl">🌈 Amazing work! 🌈</p>
-              <Button
-                onClick={onRestart}
-                className="mt-3 h-14 animate-pulse cursor-pointer bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 font-bold text-lg text-white shadow-xl transition-all hover:scale-105 hover:from-pink-500 hover:via-purple-500 hover:to-blue-500 sm:mt-4 sm:h-16 sm:text-xl"
-                size="lg"
-              >
-                <span className="mr-1 sm:mr-2">🎮</span>
-                Play Again
-                <span className="ml-1 sm:ml-2">🎮</span>
-              </Button>
-            </div>
-          </>
+          <CompletionScreen onRestart={onRestart} />
         ) : (
           <>
             {/* Normal Game State */}
@@ -313,110 +284,15 @@ export default function GameBoard({
               </Button>
             </div>
 
-            {/* Equation Display */}
-            <div className="flex flex-wrap items-center justify-center gap-2 font-black text-4xl sm:gap-3 sm:text-5xl lg:text-6xl">
-              {currentOperation === "multiplication" && multiplicationTable !== null ? (
-                <>
-                  {/* Multiplication Mode - Show times table × board value = target */}
-                  {multiplicationSwapOrder ? (
-                    <>
-                      {/* Times table first */}
-                      <span className="min-w-[60px] rounded-xl border-2 border-blue-400 bg-gradient-to-br from-blue-100 to-cyan-100 px-3 py-1 text-blue-600 transition-all sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px]">
-                        {multiplicationTable}
-                      </span>
-                      <span className="text-3xl text-purple-500 sm:text-4xl lg:text-5xl">✖️</span>
-                      <div className="relative flex items-center gap-1 sm:gap-2">
-                        {selectedSquares.length === 0 && (
-                          <span className="animate-bounce text-2xl sm:text-3xl lg:text-4xl">👉</span>
-                        )}
-                        <span
-                          className={`min-w-[60px] rounded-xl border-2 px-3 py-1 transition-all sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px] ${
-                            firstValue !== undefined
-                              ? "border-pink-400 bg-gradient-to-br from-pink-100 to-purple-100 text-purple-600"
-                              : "border-pink-300 border-dashed bg-white/50 text-pink-300"
-                          }`}
-                        >
-                          {firstValue ?? "?"}
-                        </span>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {/* Board value first */}
-                      <div className="relative flex items-center gap-1 sm:gap-2">
-                        {selectedSquares.length === 0 && (
-                          <span className="animate-bounce text-2xl sm:text-3xl lg:text-4xl">👉</span>
-                        )}
-                        <span
-                          className={`min-w-[60px] rounded-xl border-2 px-3 py-1 transition-all sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px] ${
-                            firstValue !== undefined
-                              ? "border-pink-400 bg-gradient-to-br from-pink-100 to-purple-100 text-purple-600"
-                              : "border-pink-300 border-dashed bg-white/50 text-pink-300"
-                          }`}
-                        >
-                          {firstValue ?? "?"}
-                        </span>
-                      </div>
-                      <span className="text-3xl text-purple-500 sm:text-4xl lg:text-5xl">✖️</span>
-                      <span className="min-w-[60px] rounded-xl border-2 border-blue-400 bg-gradient-to-br from-blue-100 to-cyan-100 px-3 py-1 text-blue-600 transition-all sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px]">
-                        {multiplicationTable}
-                      </span>
-                    </>
-                  )}
-                </>
-              ) : (
-                <>
-                  {/* Addition/Subtraction Mode - Show two unknowns */}
-                  <div className="relative flex items-center gap-1 sm:gap-2">
-                    {selectedSquares.length === 0 && (
-                      <span className="animate-bounce text-2xl sm:text-3xl lg:text-4xl">👉</span>
-                    )}
-                    <span
-                      className={`min-w-[60px] rounded-xl border-2 px-3 py-1 transition-all sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px] ${
-                        firstValue !== undefined
-                          ? "border-pink-400 bg-gradient-to-br from-pink-100 to-purple-100 text-purple-600"
-                          : "border-pink-300 border-dashed bg-white/50 text-pink-300"
-                      }`}
-                    >
-                      {firstValue ?? "?"}
-                    </span>
-                  </div>
-
-                  <span className="text-3xl text-purple-500 sm:text-4xl lg:text-5xl">
-                    {operationSymbol[currentOperation]}
-                  </span>
-
-                  <div className="relative flex items-center gap-1 sm:gap-2">
-                    {selectedSquares.length === 1 && (
-                      <span className="animate-bounce text-2xl sm:text-3xl lg:text-4xl">👉</span>
-                    )}
-                    <span
-                      className={`min-w-[60px] rounded-xl border-2 px-3 py-1 transition-all sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px] ${
-                        secondValue !== undefined
-                          ? "border-pink-400 bg-gradient-to-br from-pink-100 to-purple-100 text-purple-600"
-                          : "border-pink-300 border-dashed bg-white/50 text-pink-300"
-                      }`}
-                    >
-                      {secondValue ?? "?"}
-                    </span>
-                  </div>
-                </>
-              )}
-
-              {/* Equals */}
-              <span className="text-3xl text-purple-500 sm:text-4xl lg:text-5xl">=</span>
-
-              {/* Target */}
-              <span className="min-w-[60px] rounded-xl border-2 border-yellow-400 bg-gradient-to-br from-yellow-100 to-pink-100 px-3 py-1 text-transparent shadow-lg sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px]">
-                <span className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text">{target}</span>
-              </span>
-            </div>
-
-            <div className="mt-3 font-bold text-purple-600 text-xs sm:mt-4 sm:text-sm">
-              {currentOperation === "multiplication"
-                ? "Click the square that makes the equation correct!"
-                : "Click squares on the board to fill in the ?s"}
-            </div>
+            <EquationDisplay
+              currentOperation={currentOperation}
+              multiplicationTable={multiplicationTable}
+              multiplicationSwapOrder={multiplicationSwapOrder}
+              selectedSquaresCount={selectedSquares.length}
+              firstValue={firstValue}
+              secondValue={secondValue}
+              target={target}
+            />
           </>
         )}
       </Card>
