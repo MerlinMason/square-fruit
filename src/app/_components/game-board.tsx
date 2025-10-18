@@ -20,6 +20,7 @@ type GameBoardProps = {
   mode: OperationMode;
   maxNumber: number;
   boardSize: number;
+  selectedTimesTables: number[];
   onComplete: (completedImage: number) => void;
   onRestart: () => void;
   onExit: () => void;
@@ -44,12 +45,22 @@ function calculateTarget(op: "addition" | "subtraction" | "multiplication", val1
   }
 }
 
-// Check if two values match target for given operation
+// Check if values match target for given operation
 function checkAnswer(
   selectedValues: number[],
   target: number,
   currentOp: "addition" | "subtraction" | "multiplication",
+  multiplicationTable: number | null,
 ): boolean {
+  // Multiplication mode: single square selection
+  if (currentOp === "multiplication" && multiplicationTable !== null) {
+    if (selectedValues.length !== 1) return false;
+    const val = selectedValues[0];
+    if (val === undefined) return false;
+    return val * multiplicationTable === target;
+  }
+
+  // Addition/Subtraction mode: two square selection
   if (selectedValues.length !== 2) return false;
 
   const [val1, val2] = selectedValues;
@@ -60,7 +71,7 @@ function checkAnswer(
     return Math.abs(val1 - val2) === target;
   }
 
-  // For addition and multiplication, order doesn't matter
+  // For addition, order doesn't matter
   return calculateTarget(currentOp, val1, val2) === target;
 }
 
@@ -68,6 +79,7 @@ export default function GameBoard({
   mode,
   maxNumber,
   boardSize,
+  selectedTimesTables,
   onComplete,
   onRestart,
   onExit,
@@ -81,6 +93,9 @@ export default function GameBoard({
   const [backgroundImage, setBackgroundImage] = useState<string>("");
   const [backgroundImageNumber, setBackgroundImageNumber] = useState<number>(1);
   const [isComplete, setIsComplete] = useState(false);
+  // For multiplication mode: track the times table multiplier and whether to swap display order
+  const [multiplicationTable, setMultiplicationTable] = useState<number | null>(null);
+  const [multiplicationSwapOrder, setMultiplicationSwapOrder] = useState(false);
 
   const totalSquares = boardSize * boardSize;
 
@@ -121,44 +136,83 @@ export default function GameBoard({
       return;
     }
 
-    if (availableSquares.length < 2) return;
-
     // Determine operation for this turn first
     let operation: "addition" | "subtraction" | "multiplication";
     if (mode === "all") {
-      const ops: ("addition" | "subtraction" | "multiplication")[] = ["addition", "subtraction", "multiplication"];
-      operation = ops[randomInt(0, 2)] ?? "addition";
+      // Smart operation selection for All Mixed mode
+      if (availableSquares.length === 1) {
+        // Only 1 square left - must use multiplication
+        operation = "multiplication";
+      } else if (availableSquares.length === 2) {
+        // Only 2 squares left - must use addition or subtraction (not multiplication which only clears 1)
+        const ops: ("addition" | "subtraction")[] = ["addition", "subtraction"];
+        operation = ops[randomInt(0, 1)] ?? "addition";
+      } else {
+        // 3+ squares - any operation is fine
+        const ops: ("addition" | "subtraction" | "multiplication")[] = ["addition", "subtraction", "multiplication"];
+        operation = ops[randomInt(0, 2)] ?? "addition";
+      }
     } else {
       operation = mode as "addition" | "subtraction" | "multiplication";
     }
 
-    // Build a list of all possible targets from available squares
-    const possibleTargets: Array<{
-      target: number;
-      square1: Square;
-      square2: Square;
-    }> = [];
+    setCurrentOperation(operation);
 
-    for (let i = 0; i < availableSquares.length; i++) {
-      for (let j = i + 1; j < availableSquares.length; j++) {
-        const sq1 = availableSquares[i];
-        const sq2 = availableSquares[j];
-        if (sq1 && sq2) {
-          const target = calculateTarget(operation, sq1.value, sq2.value);
-          possibleTargets.push({ target, square1: sq1, square2: sq2 });
+    // Handle multiplication mode differently (single square selection)
+    if (operation === "multiplication") {
+      if (selectedTimesTables.length === 0) return;
+      if (availableSquares.length === 0) return;
+
+      // Pick random square from board
+      const randomSquare = availableSquares[randomInt(0, availableSquares.length - 1)];
+      if (!randomSquare) return;
+
+      // Pick random times table
+      const randomTableIndex = randomInt(0, selectedTimesTables.length - 1);
+      const timesTable = selectedTimesTables[randomTableIndex];
+      if (!timesTable) return;
+
+      // Calculate target
+      const targetValue = randomSquare.value * timesTable;
+
+      // Randomly decide order for display
+      const swapOrder = Math.random() < 0.5;
+
+      setTarget(targetValue);
+      setMultiplicationTable(timesTable);
+      setMultiplicationSwapOrder(swapOrder);
+    } else {
+      // Addition/Subtraction mode (two square selection)
+      if (availableSquares.length < 2) return;
+
+      // Build a list of all possible targets from available squares
+      const possibleTargets: Array<{
+        target: number;
+        square1: Square;
+        square2: Square;
+      }> = [];
+
+      for (let i = 0; i < availableSquares.length; i++) {
+        for (let j = i + 1; j < availableSquares.length; j++) {
+          const sq1 = availableSquares[i];
+          const sq2 = availableSquares[j];
+          if (sq1 && sq2) {
+            const target = calculateTarget(operation, sq1.value, sq2.value);
+            possibleTargets.push({ target, square1: sq1, square2: sq2 });
+          }
         }
       }
+
+      if (possibleTargets.length === 0) return;
+
+      // Pick a random valid target from the possibilities
+      const chosen = possibleTargets[randomInt(0, possibleTargets.length - 1)];
+      if (!chosen) return;
+
+      setTarget(chosen.target);
+      setMultiplicationTable(null);
     }
-
-    if (possibleTargets.length === 0) return;
-
-    // Pick a random valid target from the possibilities
-    const chosen = possibleTargets[randomInt(0, possibleTargets.length - 1)];
-    if (!chosen) return;
-
-    setCurrentOperation(operation);
-    setTarget(chosen.target);
-  }, [board, mode, onComplete, backgroundImageNumber]);
+  }, [board, mode, selectedTimesTables, onComplete, backgroundImageNumber]);
 
   // Handle square click
   const handleSquareClick = (squareId: number) => {
@@ -169,18 +223,21 @@ export default function GameBoard({
     if (selectedSquares.includes(squareId)) {
       setSelectedSquares(selectedSquares.filter((id) => id !== squareId));
     } else {
-      // Only allow 2 selections at a time
-      if (selectedSquares.length < 2) {
+      // Determine max selections based on operation
+      const maxSelections = currentOperation === "multiplication" ? 1 : 2;
+
+      // Only allow maxSelections at a time
+      if (selectedSquares.length < maxSelections) {
         const newSelected = [...selectedSquares, squareId];
         setSelectedSquares(newSelected);
 
-        // Check answer when 2 squares are selected
-        if (newSelected.length === 2) {
+        // Check answer when correct number of squares are selected
+        if (newSelected.length === maxSelections) {
           const selectedValues = newSelected
             .map((id) => board.find((sq) => sq.id === id)?.value)
             .filter((v): v is number => v !== undefined);
 
-          if (checkAnswer(selectedValues, target, currentOperation)) {
+          if (checkAnswer(selectedValues, target, currentOperation, multiplicationTable)) {
             // Correct answer! Show celebration effect
             setCelebratingSquares(newSelected);
 
@@ -209,7 +266,7 @@ export default function GameBoard({
   return (
     <div className="flex h-screen flex-col gap-3 p-4 sm:gap-4 lg:grid lg:grid-cols-9 lg:gap-8 lg:p-8">
       {/* Left Sidebar - Target Display / Completion Message */}
-      <Card className="relative flex min-w-0 flex-col overflow-auto border-4 border-pink-300 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-3 text-center shadow-xl sm:p-4 lg:col-span-4 lg:flex-1 lg:p-6">
+      <Card className="relative flex min-w-0 flex-col overflow-auto border-4 border-pink-300 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-3 text-center shadow-xl sm:p-4 md:self-start lg:col-span-4 lg:flex-1 lg:p-6">
         {isComplete ? (
           <>
             {/* Completion State */}
@@ -258,42 +315,93 @@ export default function GameBoard({
 
             {/* Equation Display */}
             <div className="flex flex-wrap items-center justify-center gap-2 font-black text-4xl sm:gap-3 sm:text-5xl lg:text-6xl">
-              {/* First Number */}
-              <div className="relative flex items-center gap-1 sm:gap-2">
-                {selectedSquares.length === 0 && (
-                  <span className="animate-bounce text-2xl sm:text-3xl lg:text-4xl">👉</span>
-                )}
-                <span
-                  className={`min-w-[60px] rounded-xl border-2 px-3 py-1 transition-all sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px] ${
-                    firstValue !== undefined
-                      ? "border-pink-400 bg-gradient-to-br from-pink-100 to-purple-100 text-purple-600"
-                      : "border-pink-300 border-dashed bg-white/50 text-pink-300"
-                  }`}
-                >
-                  {firstValue ?? "?"}
-                </span>
-              </div>
+              {currentOperation === "multiplication" && multiplicationTable !== null ? (
+                <>
+                  {/* Multiplication Mode - Show times table × board value = target */}
+                  {multiplicationSwapOrder ? (
+                    <>
+                      {/* Times table first */}
+                      <span className="min-w-[60px] rounded-xl border-2 border-blue-400 bg-gradient-to-br from-blue-100 to-cyan-100 px-3 py-1 text-blue-600 transition-all sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px]">
+                        {multiplicationTable}
+                      </span>
+                      <span className="text-3xl text-purple-500 sm:text-4xl lg:text-5xl">✖️</span>
+                      <div className="relative flex items-center gap-1 sm:gap-2">
+                        {selectedSquares.length === 0 && (
+                          <span className="animate-bounce text-2xl sm:text-3xl lg:text-4xl">👉</span>
+                        )}
+                        <span
+                          className={`min-w-[60px] rounded-xl border-2 px-3 py-1 transition-all sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px] ${
+                            firstValue !== undefined
+                              ? "border-pink-400 bg-gradient-to-br from-pink-100 to-purple-100 text-purple-600"
+                              : "border-pink-300 border-dashed bg-white/50 text-pink-300"
+                          }`}
+                        >
+                          {firstValue ?? "?"}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Board value first */}
+                      <div className="relative flex items-center gap-1 sm:gap-2">
+                        {selectedSquares.length === 0 && (
+                          <span className="animate-bounce text-2xl sm:text-3xl lg:text-4xl">👉</span>
+                        )}
+                        <span
+                          className={`min-w-[60px] rounded-xl border-2 px-3 py-1 transition-all sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px] ${
+                            firstValue !== undefined
+                              ? "border-pink-400 bg-gradient-to-br from-pink-100 to-purple-100 text-purple-600"
+                              : "border-pink-300 border-dashed bg-white/50 text-pink-300"
+                          }`}
+                        >
+                          {firstValue ?? "?"}
+                        </span>
+                      </div>
+                      <span className="text-3xl text-purple-500 sm:text-4xl lg:text-5xl">✖️</span>
+                      <span className="min-w-[60px] rounded-xl border-2 border-blue-400 bg-gradient-to-br from-blue-100 to-cyan-100 px-3 py-1 text-blue-600 transition-all sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px]">
+                        {multiplicationTable}
+                      </span>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  {/* Addition/Subtraction Mode - Show two unknowns */}
+                  <div className="relative flex items-center gap-1 sm:gap-2">
+                    {selectedSquares.length === 0 && (
+                      <span className="animate-bounce text-2xl sm:text-3xl lg:text-4xl">👉</span>
+                    )}
+                    <span
+                      className={`min-w-[60px] rounded-xl border-2 px-3 py-1 transition-all sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px] ${
+                        firstValue !== undefined
+                          ? "border-pink-400 bg-gradient-to-br from-pink-100 to-purple-100 text-purple-600"
+                          : "border-pink-300 border-dashed bg-white/50 text-pink-300"
+                      }`}
+                    >
+                      {firstValue ?? "?"}
+                    </span>
+                  </div>
 
-              {/* Operator */}
-              <span className="text-3xl text-purple-500 sm:text-4xl lg:text-5xl">
-                {operationSymbol[currentOperation]}
-              </span>
+                  <span className="text-3xl text-purple-500 sm:text-4xl lg:text-5xl">
+                    {operationSymbol[currentOperation]}
+                  </span>
 
-              {/* Second Number */}
-              <div className="relative flex items-center gap-1 sm:gap-2">
-                {selectedSquares.length === 1 && (
-                  <span className="animate-bounce text-2xl sm:text-3xl lg:text-4xl">👉</span>
-                )}
-                <span
-                  className={`min-w-[60px] rounded-xl border-2 px-3 py-1 transition-all sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px] ${
-                    secondValue !== undefined
-                      ? "border-pink-400 bg-gradient-to-br from-pink-100 to-purple-100 text-purple-600"
-                      : "border-pink-300 border-dashed bg-white/50 text-pink-300"
-                  }`}
-                >
-                  {secondValue ?? "?"}
-                </span>
-              </div>
+                  <div className="relative flex items-center gap-1 sm:gap-2">
+                    {selectedSquares.length === 1 && (
+                      <span className="animate-bounce text-2xl sm:text-3xl lg:text-4xl">👉</span>
+                    )}
+                    <span
+                      className={`min-w-[60px] rounded-xl border-2 px-3 py-1 transition-all sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px] ${
+                        secondValue !== undefined
+                          ? "border-pink-400 bg-gradient-to-br from-pink-100 to-purple-100 text-purple-600"
+                          : "border-pink-300 border-dashed bg-white/50 text-pink-300"
+                      }`}
+                    >
+                      {secondValue ?? "?"}
+                    </span>
+                  </div>
+                </>
+              )}
 
               {/* Equals */}
               <span className="text-3xl text-purple-500 sm:text-4xl lg:text-5xl">=</span>
@@ -305,7 +413,9 @@ export default function GameBoard({
             </div>
 
             <div className="mt-3 font-bold text-purple-600 text-xs sm:mt-4 sm:text-sm">
-              Click squares on the board to fill in the ?s
+              {currentOperation === "multiplication"
+                ? "Click the square that makes the equation correct!"
+                : "Click squares on the board to fill in the ?s"}
             </div>
           </>
         )}

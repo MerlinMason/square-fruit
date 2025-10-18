@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useLocalStorage } from "usehooks-ts";
 
 type OperationMode = "addition" | "subtraction" | "multiplication" | "all";
@@ -14,6 +15,7 @@ type GameConfig = {
   mode: OperationMode;
   maxNumber: number;
   boardSize: number;
+  selectedTimesTables: number[];
 };
 
 type GameState = "config" | "playing";
@@ -22,6 +24,7 @@ const DEFAULT_CONFIG: GameConfig = {
   mode: "addition",
   maxNumber: 12,
   boardSize: 6,
+  selectedTimesTables: [2, 5, 10],
 };
 
 // Constants
@@ -36,6 +39,13 @@ export default function MathGame() {
   const [gameState, setGameState] = useState<GameState>("config");
   const [config, setConfig] = useLocalStorage<GameConfig>("square-fruit-config", DEFAULT_CONFIG);
   const [unlockedImages, setUnlockedImages] = useLocalStorage<number[]>("square-fruit-unlocked", []);
+
+  // Ensure selectedTimesTables exists (for backwards compatibility with old localStorage)
+  useEffect(() => {
+    if (isMounted && !config.selectedTimesTables) {
+      setConfig({ ...config, selectedTimesTables: DEFAULT_CONFIG.selectedTimesTables });
+    }
+  }, [isMounted, config, setConfig]);
 
   // Only render client-specific content after mounting
   useEffect(() => {
@@ -65,6 +75,14 @@ export default function MathGame() {
   }
 
   const handleStartGame = () => {
+    // Validate times tables selection for multiplication modes
+    if (
+      (config.mode === "multiplication" || config.mode === "all") &&
+      (config.selectedTimesTables?.length ?? 0) === 0
+    ) {
+      toast.error("Please select at least one times table to practice! 🔢");
+      return;
+    }
     setGameState("playing");
   };
 
@@ -157,6 +175,55 @@ export default function MathGame() {
                 </div>
               </div>
 
+              {/* Times Tables Selection - Only show for multiplication modes */}
+              {(config.mode === "multiplication" || config.mode === "all") && (
+                <div className="space-y-3 rounded-2xl bg-white/60 p-4 backdrop-blur-sm sm:space-y-4 sm:p-6">
+                  <h3 className="font-bold text-base text-blue-600 sm:text-lg">✖️ Times Tables to Practice</h3>
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3">
+                    {[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((num) => {
+                      const isSelected = config.selectedTimesTables?.includes(num) ?? false;
+                      return (
+                        <button
+                          key={num}
+                          type="button"
+                          onClick={() => {
+                            const timesTables = config.selectedTimesTables || [];
+                            if (isSelected) {
+                              setConfig({
+                                ...config,
+                                selectedTimesTables: timesTables.filter((n) => n !== num),
+                              });
+                            } else {
+                              setConfig({
+                                ...config,
+                                selectedTimesTables: [...timesTables, num].sort((a, b) => a - b),
+                              });
+                            }
+                          }}
+                          className={`relative cursor-pointer overflow-hidden rounded-2xl border-2 p-3 font-bold text-base transition-all duration-200 sm:p-4 sm:text-lg ${
+                            isSelected
+                              ? "scale-105 border-blue-400 bg-gradient-to-br from-blue-200 via-cyan-100 to-blue-200 text-blue-700 shadow-blue-300/50 shadow-lg"
+                              : "border-blue-200/50 bg-white/90 text-blue-300 hover:scale-105 hover:border-blue-300 hover:bg-gradient-to-br hover:from-blue-50 hover:to-cyan-50 hover:shadow-md"
+                          }`}
+                        >
+                          <span className="relative">
+                            {isSelected && <span className="mr-1 text-base">✓</span>}
+                            {num}×
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-center text-blue-600/70 text-xs sm:text-sm">
+                    ✨{" "}
+                    {(config.selectedTimesTables?.length ?? 0) > 0
+                      ? `Practicing: ${config.selectedTimesTables?.join(", ")}`
+                      : "Select times tables to practice"}{" "}
+                    ✨
+                  </p>
+                </div>
+              )}
+
               {/* Board Size Selection */}
               <div className="space-y-4 rounded-2xl bg-white/60 p-4 backdrop-blur-sm sm:p-6">
                 <div className="flex items-center justify-between gap-2">
@@ -238,6 +305,7 @@ export default function MathGame() {
         mode={config.mode}
         maxNumber={config.maxNumber}
         boardSize={config.boardSize}
+        selectedTimesTables={config.selectedTimesTables || DEFAULT_CONFIG.selectedTimesTables}
         onComplete={handleGameComplete}
         onRestart={handleRestart}
         onExit={() => setGameState("config")}
