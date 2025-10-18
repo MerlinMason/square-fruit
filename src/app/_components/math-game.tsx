@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useLocalStorage } from "usehooks-ts";
+import GameBoard from "@/app/_components/game-board";
+import RewardGallery from "@/app/_components/reward-gallery";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
-import GameBoard from "@/app/_components/game-board";
-import RewardGallery from "@/app/_components/reward-gallery";
+import { useEffect, useState } from "react";
+import { useLocalStorage } from "usehooks-ts";
 
 type OperationMode = "addition" | "subtraction" | "multiplication" | "all";
 
@@ -16,13 +16,20 @@ type GameConfig = {
 	boardSize: number;
 };
 
-type GameState = "config" | "playing" | "completed";
+type GameState = "config" | "playing";
 
 const DEFAULT_CONFIG: GameConfig = {
 	mode: "addition",
 	maxNumber: 12,
 	boardSize: 6,
 };
+
+// Constants
+const BOARD_SIZE_MIN = 4;
+const BOARD_SIZE_MAX = 10;
+const BOARD_SIZE_STEP = 2;
+const NUMBER_RANGE_MIN = 1;
+const NUMBER_RANGE_MAX = 100;
 
 export default function MathGame() {
 	const [isMounted, setIsMounted] = useState(false);
@@ -45,33 +52,24 @@ export default function MathGame() {
 	if (!isMounted) {
 		return (
 			<div className="container mx-auto flex min-h-screen items-center justify-center p-4">
-				<Card className="relative w-full max-w-2xl border-4 border-pink-200 bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 shadow-2xl">
-					<CardHeader className="space-y-2">
-						<img
-							src="/assets/logo.webp"
-							alt="Square Fruit Logo"
-							className="mx-auto h-32 w-auto"
-						/>
-						<div className="space-y-1">
-							<CardTitle className="relative text-center font-bold text-7xl">
-								<span className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent blur-sm">
+				<Card className="w-full max-w-2xl border-4 border-pink-200 bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 shadow-2xl">
+					<CardHeader>
+						<div className="flex items-center gap-4">
+							<img
+								src="/assets/logo.webp"
+								alt="Square Fruit Logo"
+								className="h-24 w-auto flex-shrink-0"
+							/>
+							<div className="flex flex-col">
+								<CardTitle className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text font-bold text-4xl text-transparent">
 									Square Fruit
-								</span>
-								<span
-									className="relative animate-pulse bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent drop-shadow-[0_0_5px_rgba(219,39,119,0.3)]"
-									style={{
-										WebkitTextStroke: "3px white",
-										paintOrder: "stroke fill",
-									}}
-								>
-									Square Fruit
-								</span>
-							</CardTitle>
-							<p className="text-center font-medium text-lg text-purple-500">
-								✨ Magical Maths Game ✨
-							</p>
+								</CardTitle>
+								<p className="font-medium text-lg text-purple-500">
+									✨ Magical Maths Game ✨
+								</p>
+							</div>
 						</div>
-						<p className="text-center text-muted-foreground text-sm">
+						<p className="mt-4 text-center text-muted-foreground text-sm">
 							Loading...
 						</p>
 					</CardHeader>
@@ -106,19 +104,21 @@ export default function MathGame() {
 
 				<div className="relative grid grid-cols-1 gap-6 lg:grid-cols-2">
 					<Card className="border-4 border-pink-200 bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 shadow-2xl">
-						<CardHeader className="space-y-2">
-							<img
-								src="/assets/logo.webp"
-								alt="Square Fruit Logo"
-								className="mx-auto h-32 w-auto"
-							/>
-							<div className="space-y-1">
-								<CardTitle className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-center font-bold text-4xl text-transparent">
-									Square Fruit
-								</CardTitle>
-								<p className="text-center font-medium text-lg text-purple-500">
-									✨ Magical Maths Game ✨
-								</p>
+						<CardHeader>
+							<div className="flex items-center gap-4">
+								<img
+									src="/assets/logo.webp"
+									alt="Square Fruit Logo"
+									className="h-24 w-auto flex-shrink-0"
+								/>
+								<div className="flex flex-col">
+									<CardTitle className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text font-bold text-4xl text-transparent">
+										Square Fruit
+									</CardTitle>
+									<p className="font-medium text-lg text-purple-500">
+										✨ Magical Maths Game ✨
+									</p>
+								</div>
 							</div>
 						</CardHeader>
 						<CardContent className="space-y-8">
@@ -196,14 +196,17 @@ export default function MathGame() {
 								<Slider
 									value={[config.boardSize]}
 									onValueChange={(value) => {
-										const size = value[0] ?? 4;
+										const size = value[0] ?? BOARD_SIZE_MIN;
 										// Ensure even number of squares by using even board sizes only
 										const evenSize = size % 2 === 0 ? size : size + 1;
-										setConfig({ ...config, boardSize: Math.min(evenSize, 10) });
+										setConfig({
+											...config,
+											boardSize: Math.min(evenSize, BOARD_SIZE_MAX),
+										});
 									}}
-									min={4}
-									max={10}
-									step={2}
+									min={BOARD_SIZE_MIN}
+									max={BOARD_SIZE_MAX}
+									step={BOARD_SIZE_STEP}
 									className="w-full"
 								/>
 								<p className="text-center text-purple-600/70 text-sm">
@@ -224,10 +227,13 @@ export default function MathGame() {
 								<Slider
 									value={[config.maxNumber]}
 									onValueChange={(value) =>
-										setConfig({ ...config, maxNumber: value[0] ?? 12 })
+										setConfig({
+											...config,
+											maxNumber: value[0] ?? DEFAULT_CONFIG.maxNumber,
+										})
 									}
-									min={1}
-									max={100}
+									min={NUMBER_RANGE_MIN}
+									max={NUMBER_RANGE_MAX}
 									step={1}
 									className="w-full"
 								/>
@@ -239,7 +245,7 @@ export default function MathGame() {
 							{/* Start Button */}
 							<Button
 								onClick={handleStartGame}
-								className="h-16 w-full cursor-pointer animate-pulse bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 font-bold text-2xl text-white shadow-xl transition-all hover:scale-105 hover:from-pink-500 hover:via-purple-500 hover:to-blue-500 hover:shadow-2xl"
+								className="h-16 w-full animate-pulse cursor-pointer bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 font-bold text-2xl text-white shadow-xl transition-all hover:scale-105 hover:from-pink-500 hover:via-purple-500 hover:to-blue-500 hover:shadow-2xl"
 								size="lg"
 							>
 								<span className="mr-2">🌟</span>

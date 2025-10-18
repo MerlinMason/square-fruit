@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useEffect, useState } from "react";
 
 type OperationMode = "addition" | "subtraction" | "multiplication" | "all";
+
+// Constants
+const REWARD_IMAGES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const CELEBRATION_DELAY = 600;
 
 type Square = {
 	id: number;
@@ -46,7 +50,6 @@ function calculateTarget(
 
 // Check if two values match target for given operation
 function checkAnswer(
-	mode: OperationMode,
 	selectedValues: number[],
 	target: number,
 	currentOp: "addition" | "subtraction" | "multiplication",
@@ -90,13 +93,13 @@ export default function GameBoard({
 	// Select background image on mount - prioritize unseen images
 	// biome-ignore lint/correctness/useExhaustiveDependencies: Only run once on mount to keep image stable
 	useEffect(() => {
-		const allImages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-		const unseenImages = allImages.filter(
+		const unseenImages = REWARD_IMAGES.filter(
 			(num) => !unlockedImages.includes(num),
 		);
 
 		// If there are unseen images, pick one of those. Otherwise pick random.
-		const availableImages = unseenImages.length > 0 ? unseenImages : allImages;
+		const availableImages =
+			unseenImages.length > 0 ? unseenImages : REWARD_IMAGES;
 		const chosenNumber =
 			availableImages[randomInt(0, availableImages.length - 1)] ?? 1;
 
@@ -191,7 +194,7 @@ export default function GameBoard({
 						.map((id) => board.find((sq) => sq.id === id)?.value)
 						.filter((v): v is number => v !== undefined);
 
-					if (checkAnswer(mode, selectedValues, target, currentOperation)) {
+					if (checkAnswer(selectedValues, target, currentOperation)) {
 						// Correct answer! Show celebration effect
 						setCelebratingSquares(newSelected);
 
@@ -203,7 +206,7 @@ export default function GameBoard({
 							);
 							setSelectedSquares([]);
 							setCelebratingSquares([]);
-						}, 600);
+						}, CELEBRATION_DELAY);
 					}
 				}
 			}
@@ -260,7 +263,7 @@ export default function GameBoard({
 							</p>
 							<Button
 								onClick={onRestart}
-								className="mt-4 h-16 animate-pulse cursor-pointer bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 font-bold text-xl text-white shadow-xl transition-all hover:scale-105 hover:from-pink-500 hover:via-purple-500 hover:to-blue-500"
+								className="mt-4 h-16 animate-pulse cursor-pointer bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 font-bold text-white text-xl shadow-xl transition-all hover:scale-105 hover:from-pink-500 hover:via-purple-500 hover:to-blue-500"
 								size="lg"
 							>
 								<span className="mr-2">🎮</span>
@@ -273,7 +276,7 @@ export default function GameBoard({
 					<>
 						{/* Normal Game State */}
 						{/* Header with Logo and Title */}
-						<div className="mb-6 flex items-center justify-center gap-4">
+						<div className="mb-4 flex items-center justify-center gap-4">
 							<img
 								src="/assets/logo.webp"
 								alt="Square Fruit Logo"
@@ -291,12 +294,9 @@ export default function GameBoard({
 								Exit
 							</Button>
 						</div>
-						<div className="font-bold text-pink-600 text-sm uppercase tracking-wider">
-							Solve the Puzzle!
-						</div>
 
 						{/* Equation Display */}
-						<div className="my-6 flex items-center justify-center gap-4 font-black text-6xl">
+						<div className="flex items-center justify-center gap-4 font-black text-6xl">
 							{/* First Number */}
 							<div className="relative flex items-center gap-2">
 								{selectedSquares.length === 0 && (
