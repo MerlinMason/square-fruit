@@ -1,154 +1,149 @@
 "use client";
 
 import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogTrigger,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
 
 type RewardGalleryProps = {
-	unlockedImages: number[];
-	onResetProgress: () => void;
+  unlockedImages: number[];
+  onResetProgress: () => void;
 };
 
 // Constants
 export const ALL_REWARD_IMAGES = Array.from({ length: 12 }, (_, i) => i + 1);
 const THUMBNAIL_ASPECT_RATIO = "12.8/9";
 
-export default function RewardGallery({
-	unlockedImages,
-	onResetProgress,
-}: RewardGalleryProps) {
-	const [selectedImage, setSelectedImage] = useState<number | null>(null);
+export default function RewardGallery({ unlockedImages, onResetProgress }: RewardGalleryProps) {
+  const [selectedImage, setSelectedImage] = useState<number | null>(null);
 
-	return (
-		<>
-			<Card className="border-4 border-purple-300 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 shadow-xl">
-				<CardHeader className="space-y-0 p-4 sm:p-6">
-					<div className="flex items-start justify-between gap-2">
-						<div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
-							<div className="flex h-16 w-16 flex-shrink-0 items-center justify-center text-5xl sm:h-24 sm:w-24 sm:text-7xl">
-								🏆
-							</div>
-							<div className="flex min-w-0 flex-1 flex-col">
-								<CardTitle className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text font-bold text-2xl text-transparent sm:text-4xl">
-									Reward Gallery
-								</CardTitle>
-								<p className="font-medium text-purple-600 text-sm sm:text-lg">
-									{unlockedImages.length} / {ALL_REWARD_IMAGES.length} collected
-								</p>
-							</div>
-						</div>
+  return (
+    <>
+      <Card className="border-4 border-purple-300 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 shadow-xl">
+        <CardHeader className="space-y-0 p-4 sm:p-6">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
+              <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center text-5xl sm:h-24 sm:w-24 sm:text-7xl">
+                🏆
+              </div>
+              <div className="flex min-w-0 flex-1 flex-col">
+                <CardTitle className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text font-bold text-2xl text-transparent sm:text-4xl">
+                  Reward Gallery
+                </CardTitle>
+                <p className="font-medium text-purple-600 text-sm sm:text-lg">
+                  {unlockedImages.length} / {ALL_REWARD_IMAGES.length} collected
+                </p>
+              </div>
+            </div>
 
-						{/* Reset Progress Button */}
-						<AlertDialog>
-							<AlertDialogTrigger asChild>
-								<Button
-									variant="outline"
-									size="sm"
-									className="flex-shrink-0 cursor-pointer border-2 border-red-300 text-red-600 text-xs hover:border-red-400 hover:bg-red-50 sm:text-sm"
-								>
-									🔄 Reset
-								</Button>
-							</AlertDialogTrigger>
-							<AlertDialogContent className="border-4 border-pink-300 bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
-								<AlertDialogHeader>
-									<AlertDialogTitle className="text-2xl">
-										⚠️{" "}
-										<span className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
-											Reset Progress?
-										</span>
-									</AlertDialogTitle>
-									<AlertDialogDescription className="text-lg text-purple-600">
-										Are you sure you want to reset all progress? You will lose
-										all unlocked rewards and this cannot be undone.
-									</AlertDialogDescription>
-								</AlertDialogHeader>
-								<AlertDialogFooter>
-									<AlertDialogCancel className="cursor-pointer border-2 border-gray-300 hover:border-gray-400">
-										Cancel
-									</AlertDialogCancel>
-									<AlertDialogAction
-										onClick={onResetProgress}
-										className="cursor-pointer bg-gradient-to-r from-red-400 to-red-600 text-white hover:from-red-500 hover:to-red-700"
-									>
-										Reset Progress
-									</AlertDialogAction>
-								</AlertDialogFooter>
-							</AlertDialogContent>
-						</AlertDialog>
-					</div>
-				</CardHeader>
-				<CardContent className="space-y-3 p-4 sm:space-y-4 sm:p-6">
-					<h3 className="font-bold text-base text-purple-600 sm:text-lg">
-						🔑 Can you unlock every one?
-					</h3>
-					<div className="grid grid-cols-3 gap-2 sm:gap-3">
-						{ALL_REWARD_IMAGES.map((imageNum) => {
-							const isUnlocked = unlockedImages.includes(imageNum);
-							return (
-								<button
-									key={imageNum}
-									onClick={() => isUnlocked && setSelectedImage(imageNum)}
-									disabled={!isUnlocked}
-									className={`relative overflow-hidden rounded-lg border-2 transition-all sm:rounded-xl sm:border-4 ${
-										isUnlocked
-											? "cursor-pointer border-pink-300 bg-white shadow-lg hover:scale-105 hover:shadow-xl"
-											: "cursor-not-allowed border-gray-300 bg-gray-200"
-									}`}
-									style={{ aspectRatio: THUMBNAIL_ASPECT_RATIO }}
-									type="button"
-								>
-									{isUnlocked ? (
-										<img
-											src={`/assets/${imageNum}.png`}
-											alt={`Reward ${imageNum}`}
-											className="h-full w-full object-cover"
-										/>
-									) : (
-										<div className="flex h-full w-full items-center justify-center text-2xl text-gray-400 sm:text-4xl">
-											🔒
-										</div>
-									)}
-								</button>
-							);
-						})}
-					</div>
-				</CardContent>
-			</Card>
+            {/* Reset Progress Button */}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-shrink-0 cursor-pointer border-2 border-red-300 text-red-600 text-xs hover:border-red-400 hover:bg-red-50 sm:text-sm"
+                >
+                  🔄 Reset
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="border-4 border-pink-300 bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-2xl">
+                    ⚠️{" "}
+                    <span className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
+                      Reset Progress?
+                    </span>
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="text-lg text-purple-600">
+                    Are you sure you want to reset all progress? You will lose all unlocked rewards and this cannot be
+                    undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="cursor-pointer border-2 border-gray-300 hover:border-gray-400">
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={onResetProgress}
+                    className="cursor-pointer bg-gradient-to-r from-red-400 to-red-600 text-white hover:from-red-500 hover:to-red-700"
+                  >
+                    Reset Progress
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3 p-4 sm:space-y-4 sm:p-6">
+          <h3 className="font-bold text-base text-purple-600 sm:text-lg">🔑 Can you unlock every one?</h3>
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            {ALL_REWARD_IMAGES.map((imageNum) => {
+              const isUnlocked = unlockedImages.includes(imageNum);
+              return (
+                <button
+                  key={imageNum}
+                  onClick={() => isUnlocked && setSelectedImage(imageNum)}
+                  disabled={!isUnlocked}
+                  className={`relative overflow-hidden rounded-lg border-2 transition-all sm:rounded-xl sm:border-4 ${
+                    isUnlocked
+                      ? "cursor-pointer border-pink-300 bg-white shadow-lg hover:scale-105 hover:shadow-xl"
+                      : "cursor-not-allowed border-gray-300 bg-gray-200"
+                  }`}
+                  style={{ aspectRatio: THUMBNAIL_ASPECT_RATIO }}
+                  type="button"
+                >
+                  {isUnlocked ? (
+                    <img
+                      src={`/assets/${imageNum}.png`}
+                      alt={`Reward ${imageNum}`}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-2xl text-gray-400 sm:text-4xl">
+                      🔒
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
-			{/* Lightbox Modal */}
-			{selectedImage && (
-				<div
-					className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-					onClick={() => setSelectedImage(null)}
-					onKeyDown={(e) => e.key === "Escape" && setSelectedImage(null)}
-				>
-					<div className="relative max-h-[90vh] max-w-[90vw]">
-						<button
-							onClick={() => setSelectedImage(null)}
-							className="-right-4 -top-4 absolute flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 text-2xl text-white shadow-2xl transition-all hover:scale-110"
-							type="button"
-						>
-							✕
-						</button>
-						<img
-							src={`/assets/${selectedImage}.png`}
-							alt={`Reward ${selectedImage}`}
-							className="max-h-[90vh] max-w-[90vw] rounded-2xl border-8 border-white shadow-2xl"
-						/>
-					</div>
-				</div>
-			)}
-		</>
-	);
+      {/* Lightbox Modal */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setSelectedImage(null)}
+          onKeyDown={(e) => e.key === "Escape" && setSelectedImage(null)}
+        >
+          <div className="relative max-h-[90vh] max-w-[90vw]">
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="-right-4 -top-4 absolute flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 text-2xl text-white shadow-2xl transition-all hover:scale-110"
+              type="button"
+            >
+              ✕
+            </button>
+            <img
+              src={`/assets/${selectedImage}.png`}
+              alt={`Reward ${selectedImage}`}
+              className="max-h-[90vh] max-w-[90vw] rounded-2xl border-8 border-white shadow-2xl"
+            />
+          </div>
+        </div>
+      )}
+    </>
+  );
 }

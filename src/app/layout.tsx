@@ -6,26 +6,24 @@ import { Poetsen_One } from "next/font/google";
 import { TRPCReactProvider } from "@/trpc/react";
 
 export const metadata: Metadata = {
-	title: "Square Fruit - Magical Maths Game",
-	description: "A fun and magical maths game for kids",
-	icons: [{ rel: "icon", url: "/favicon.ico" }],
+  title: "Square Fruit - Magical Maths Game",
+  description: "A fun and magical maths game for kids",
+  icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
 const poetsenOne = Poetsen_One({
-	weight: "400",
-	subsets: ["latin"],
-	variable: "--font-poetsen",
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-poetsen",
 });
 
-export default function RootLayout({
-	children,
-}: Readonly<{ children: React.ReactNode }>) {
-	return (
-		<html lang="en" className={`${poetsenOne.variable}`}>
-			<Analytics />
-			<body className="font-poetsen">
-				<TRPCReactProvider>{children}</TRPCReactProvider>
-			</body>
-		</html>
-	);
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html lang="en" className={`${poetsenOne.variable}`}>
+      <Analytics />
+      <body className="font-poetsen">
+        <TRPCReactProvider>{children}</TRPCReactProvider>
+      </body>
+    </html>
+  );
 }
