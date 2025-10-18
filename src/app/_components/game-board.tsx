@@ -260,9 +260,9 @@ export default function GameBoard({
   const secondValue = selectedValues[1];
 
   return (
-    <div className="flex h-screen flex-col gap-3 p-4 sm:gap-4 lg:grid lg:grid-cols-9 lg:gap-8 lg:p-8">
-      {/* Left Sidebar - Target Display / Completion Message */}
-      <Card className="relative flex min-w-0 flex-col overflow-auto border-4 border-pink-300 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-3 text-center shadow-xl sm:p-4 md:self-start lg:col-span-4 lg:flex-1 lg:p-6">
+    <div className="container mx-auto flex min-h-screen flex-col gap-4 p-4 md:flex-row md:items-start md:gap-6 md:p-8">
+      {/* Left Sidebar - Target Display / Completion Message - 2/5 width on medium+ screens */}
+      <Card className="relative flex min-w-0 flex-col border-4 border-pink-300 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-4 text-center shadow-xl md:w-2/5 md:shrink-0 md:p-6">
         {isComplete ? (
           <CompletionScreen onRestart={onRestart} />
         ) : (
@@ -297,8 +297,8 @@ export default function GameBoard({
         )}
       </Card>
 
-      {/* Right Side - Game Board - Square */}
-      <div className="relative aspect-square shrink-0 rounded-2xl p-1 shadow-xl lg:col-span-5">
+      {/* Right Side - Game Board - 3/5 width on medium+ screens */}
+      <div className="relative aspect-square rounded-2xl p-1 shadow-xl md:w-3/5">
         {/* Background image that gets revealed */}
         <div className="absolute inset-0 overflow-hidden rounded-2xl">
           {backgroundImage && (
