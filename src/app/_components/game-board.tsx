@@ -227,35 +227,35 @@ export default function GameBoard({
 	const secondValue = selectedValues[1];
 
 	return (
-		<div className="grid grid-cols-9 gap-14 overflow-hidden p-8">
+		<div className="flex h-screen flex-col gap-3 p-4 sm:gap-4 lg:grid lg:grid-cols-9 lg:gap-8 lg:p-8">
 			{/* Left Sidebar - Target Display / Completion Message */}
-			<Card className="relative col-span-4 flex min-w-0 flex-1 flex-col overflow-auto border-4 border-pink-300 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-6 text-center shadow-xl">
+			<Card className="relative flex min-w-0 flex-col overflow-auto border-4 border-pink-300 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-3 text-center shadow-xl sm:p-4 lg:col-span-4 lg:flex-1 lg:p-6">
 				{isComplete ? (
 					<>
 						{/* Completion State */}
-						<div className="space-y-4">
-							<div className="text-8xl">🎉</div>
-							<div className="animate-pulse bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text font-bold text-5xl text-transparent">
+						<div className="space-y-3 sm:space-y-4">
+							<div className="text-6xl sm:text-8xl">🎉</div>
+							<div className="animate-pulse bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text font-bold text-3xl text-transparent sm:text-5xl">
 								You Did It!
 							</div>
-							<div className="flex justify-center gap-2 text-4xl">
+							<div className="flex justify-center gap-2 text-3xl sm:text-4xl">
 								<span className="animate-bounce">⭐</span>
 								<span className="animation-delay-200 animate-bounce">✨</span>
 								<span className="animation-delay-400 animate-bounce">🌟</span>
 								<span className="animation-delay-600 animate-bounce">💖</span>
 								<span className="animation-delay-800 animate-bounce">🦄</span>
 							</div>
-							<p className="font-bold text-2xl text-purple-600">
+							<p className="font-bold text-purple-600 text-xl sm:text-2xl">
 								🌈 Amazing work! 🌈
 							</p>
 							<Button
 								onClick={onRestart}
-								className="mt-4 h-16 animate-pulse cursor-pointer bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 font-bold text-white text-xl shadow-xl transition-all hover:scale-105 hover:from-pink-500 hover:via-purple-500 hover:to-blue-500"
+								className="mt-3 h-14 animate-pulse cursor-pointer bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 font-bold text-lg text-white shadow-xl transition-all hover:scale-105 hover:from-pink-500 hover:via-purple-500 hover:to-blue-500 sm:mt-4 sm:h-16 sm:text-xl"
 								size="lg"
 							>
-								<span className="mr-2">🎮</span>
+								<span className="mr-1 sm:mr-2">🎮</span>
 								Play Again
-								<span className="ml-2">🎮</span>
+								<span className="ml-1 sm:ml-2">🎮</span>
 							</Button>
 						</div>
 					</>
@@ -263,34 +263,36 @@ export default function GameBoard({
 					<>
 						{/* Normal Game State */}
 						{/* Header with Logo and Title */}
-						<div className="mb-4 flex items-center justify-center gap-4">
+						<div className="mb-3 flex flex-wrap items-center justify-center gap-2 sm:mb-4 sm:gap-4">
 							<img
 								src="/assets/logo.webp"
 								alt="Square Fruit Logo"
-								className="h-16 w-auto"
+								className="h-12 w-auto sm:h-16"
 							/>
-							<div className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text font-bold text-4xl text-transparent">
+							<div className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text font-bold text-2xl text-transparent sm:text-4xl">
 								Square Fruit
 							</div>
 							<Button
 								onClick={onExit}
 								variant="outline"
 								size="sm"
-								className="ml-4 cursor-pointer border-2 border-pink-300 bg-white/80 font-semibold text-pink-600 hover:border-pink-400 hover:bg-pink-50"
+								className="cursor-pointer border-2 border-pink-300 bg-white/80 font-semibold text-pink-600 text-xs hover:border-pink-400 hover:bg-pink-50 sm:ml-4 sm:text-sm"
 							>
 								Exit
 							</Button>
 						</div>
 
 						{/* Equation Display */}
-						<div className="flex items-center justify-center gap-4 font-black text-6xl">
+						<div className="flex flex-wrap items-center justify-center gap-2 font-black text-4xl sm:gap-3 sm:text-5xl lg:text-6xl">
 							{/* First Number */}
-							<div className="relative flex items-center gap-2">
+							<div className="relative flex items-center gap-1 sm:gap-2">
 								{selectedSquares.length === 0 && (
-									<span className="animate-bounce text-4xl">👉</span>
+									<span className="animate-bounce text-2xl sm:text-3xl lg:text-4xl">
+										👉
+									</span>
 								)}
 								<span
-									className={`min-w-[80px] rounded-2xl border-4 px-4 py-2 transition-all ${
+									className={`min-w-[60px] rounded-xl border-2 px-3 py-1 transition-all sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px] ${
 										firstValue !== undefined
 											? "border-pink-400 bg-gradient-to-br from-pink-100 to-purple-100 text-purple-600"
 											: "border-pink-300 border-dashed bg-white/50 text-pink-300"
@@ -301,17 +303,19 @@ export default function GameBoard({
 							</div>
 
 							{/* Operator */}
-							<span className="text-5xl text-purple-500">
+							<span className="text-3xl text-purple-500 sm:text-4xl lg:text-5xl">
 								{operationSymbol[currentOperation]}
 							</span>
 
 							{/* Second Number */}
-							<div className="relative flex items-center gap-2">
+							<div className="relative flex items-center gap-1 sm:gap-2">
 								{selectedSquares.length === 1 && (
-									<span className="animate-bounce text-4xl">👉</span>
+									<span className="animate-bounce text-2xl sm:text-3xl lg:text-4xl">
+										👉
+									</span>
 								)}
 								<span
-									className={`min-w-[80px] rounded-2xl border-4 px-4 py-2 transition-all ${
+									className={`min-w-[60px] rounded-xl border-2 px-3 py-1 transition-all sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px] ${
 										secondValue !== undefined
 											? "border-pink-400 bg-gradient-to-br from-pink-100 to-purple-100 text-purple-600"
 											: "border-pink-300 border-dashed bg-white/50 text-pink-300"
@@ -322,17 +326,19 @@ export default function GameBoard({
 							</div>
 
 							{/* Equals */}
-							<span className="text-5xl text-purple-500">=</span>
+							<span className="text-3xl text-purple-500 sm:text-4xl lg:text-5xl">
+								=
+							</span>
 
 							{/* Target */}
-							<span className="min-w-[80px] rounded-2xl border-4 border-yellow-400 bg-gradient-to-br from-yellow-100 to-pink-100 px-4 py-2 text-transparent shadow-lg">
+							<span className="min-w-[60px] rounded-xl border-2 border-yellow-400 bg-gradient-to-br from-yellow-100 to-pink-100 px-3 py-1 text-transparent shadow-lg sm:min-w-[70px] sm:rounded-2xl sm:border-4 sm:px-4 sm:py-2 lg:min-w-[80px]">
 								<span className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text">
 									{target}
 								</span>
 							</span>
 						</div>
 
-						<div className="mt-4 font-bold text-purple-600 text-sm">
+						<div className="mt-3 font-bold text-purple-600 text-xs sm:mt-4 sm:text-sm">
 							Click squares on the board to fill in the ?s
 						</div>
 					</>
@@ -340,7 +346,7 @@ export default function GameBoard({
 			</Card>
 
 			{/* Right Side - Game Board - Square */}
-			<div className="relative col-span-5 aspect-square h-[full]shrink-0 rounded-2xl p-1 shadow-xl">
+			<div className="relative aspect-square shrink-0 rounded-2xl p-1 shadow-xl lg:col-span-5">
 				{/* Background image that gets revealed */}
 				<div className="absolute inset-0 overflow-hidden rounded-2xl">
 					{backgroundImage && (
@@ -365,14 +371,14 @@ export default function GameBoard({
 							key={square.id}
 							onClick={() => handleSquareClick(square.id)}
 							disabled={square.revealed}
-							className={`relative rounded-lg font-black text-2xl transition-all duration-300 ${
+							className={`relative rounded-md font-black text-lg transition-all duration-300 sm:rounded-lg sm:text-xl lg:text-2xl ${
 								square.revealed
 									? "cursor-default border-0 bg-transparent text-transparent shadow-none"
 									: celebratingSquares.includes(square.id)
-										? "z-20 scale-125 animate-bounce border-4 border-yellow-400 bg-yellow-100/90 shadow-2xl shadow-yellow-400/50 ring-4 ring-yellow-300 backdrop-blur-sm"
+										? "z-20 scale-125 animate-bounce border-2 border-yellow-400 bg-yellow-100/90 shadow-xl shadow-yellow-400/50 ring-2 ring-yellow-300 backdrop-blur-sm sm:border-4 sm:shadow-2xl sm:ring-4"
 										: selectedSquares.includes(square.id)
-											? "z-10 scale-110 border-4 border-pink-400 bg-pink-100/90 shadow-2xl shadow-pink-400/50 ring-4 ring-pink-300 backdrop-blur-sm"
-											: "border-4 border-white/80 bg-white/90 shadow-lg backdrop-blur-md hover:scale-105 hover:border-pink-300 hover:bg-white/95 hover:shadow-pink-200 hover:shadow-xl active:scale-95"
+											? "z-10 scale-110 border-2 border-pink-400 bg-pink-100/90 shadow-pink-400/50 shadow-xl ring-2 ring-pink-300 backdrop-blur-sm sm:border-4 sm:shadow-2xl sm:ring-4"
+											: "border-2 border-white/80 bg-white/90 shadow-md backdrop-blur-md hover:scale-105 hover:border-pink-300 hover:bg-white/95 hover:shadow-lg hover:shadow-pink-200 active:scale-95 sm:border-4 sm:shadow-lg sm:hover:shadow-xl"
 							}`}
 							type="button"
 						>
@@ -383,10 +389,10 @@ export default function GameBoard({
 									</span>
 									{celebratingSquares.includes(square.id) && (
 										<>
-											<span className="absolute top-0 left-0 animate-ping text-2xl">
+											<span className="absolute top-0 left-0 animate-ping text-xl sm:text-2xl">
 												✨
 											</span>
-											<span className="absolute right-0 bottom-0 animate-ping text-2xl">
+											<span className="absolute right-0 bottom-0 animate-ping text-xl sm:text-2xl">
 												⭐
 											</span>
 										</>

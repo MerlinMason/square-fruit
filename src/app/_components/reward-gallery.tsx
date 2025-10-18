@@ -33,17 +33,17 @@ export default function RewardGallery({
 	return (
 		<>
 			<Card className="border-4 border-purple-300 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 shadow-xl">
-				<CardHeader>
-					<div className="flex items-center justify-between gap-4">
-						<div className="flex items-center gap-4">
-							<div className="flex h-24 w-24 flex-shrink-0 items-center justify-center text-7xl">
+				<CardHeader className="space-y-0 p-4 sm:p-6">
+					<div className="flex items-start justify-between gap-2">
+						<div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
+							<div className="flex h-16 w-16 flex-shrink-0 items-center justify-center text-5xl sm:h-24 sm:w-24 sm:text-7xl">
 								🏆
 							</div>
-							<div className="flex flex-col">
-								<CardTitle className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text font-bold text-4xl text-transparent">
+							<div className="flex min-w-0 flex-1 flex-col">
+								<CardTitle className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text font-bold text-2xl text-transparent sm:text-4xl">
 									Reward Gallery
 								</CardTitle>
-								<p className="font-medium text-lg text-purple-600">
+								<p className="font-medium text-purple-600 text-sm sm:text-lg">
 									{unlockedImages.length} / {ALL_REWARD_IMAGES.length} collected
 								</p>
 							</div>
@@ -55,7 +55,7 @@ export default function RewardGallery({
 								<Button
 									variant="outline"
 									size="sm"
-									className="cursor-pointer border-2 border-red-300 text-red-600 hover:border-red-400 hover:bg-red-50"
+									className="flex-shrink-0 cursor-pointer border-2 border-red-300 text-red-600 text-xs hover:border-red-400 hover:bg-red-50 sm:text-sm"
 								>
 									🔄 Reset
 								</Button>
@@ -88,11 +88,11 @@ export default function RewardGallery({
 						</AlertDialog>
 					</div>
 				</CardHeader>
-				<CardContent className="space-y-4">
-					<h3 className="font-bold text-lg text-purple-600">
+				<CardContent className="space-y-3 p-4 sm:space-y-4 sm:p-6">
+					<h3 className="font-bold text-base text-purple-600 sm:text-lg">
 						🔑 Can you unlock every one?
 					</h3>
-					<div className="grid grid-cols-3 gap-3">
+					<div className="grid grid-cols-3 gap-2 sm:gap-3">
 						{ALL_REWARD_IMAGES.map((imageNum) => {
 							const isUnlocked = unlockedImages.includes(imageNum);
 							return (
@@ -100,7 +100,7 @@ export default function RewardGallery({
 									key={imageNum}
 									onClick={() => isUnlocked && setSelectedImage(imageNum)}
 									disabled={!isUnlocked}
-									className={`relative overflow-hidden rounded-xl border-4 transition-all ${
+									className={`relative overflow-hidden rounded-lg border-2 transition-all sm:rounded-xl sm:border-4 ${
 										isUnlocked
 											? "cursor-pointer border-pink-300 bg-white shadow-lg hover:scale-105 hover:shadow-xl"
 											: "cursor-not-allowed border-gray-300 bg-gray-200"
@@ -115,7 +115,7 @@ export default function RewardGallery({
 											className="h-full w-full object-cover"
 										/>
 									) : (
-										<div className="flex h-full w-full items-center justify-center text-4xl text-gray-400">
+										<div className="flex h-full w-full items-center justify-center text-2xl text-gray-400 sm:text-4xl">
 											🔒
 										</div>
 									)}

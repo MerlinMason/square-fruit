@@ -1,12 +1,13 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(bun run typecheck:*)",
-      "Bash(bun run typecheck:check:*)",
-      "Bash(bun run check:*)",
-      "Bash(bunx shadcn@latest add:*)"
-    ],
-    "deny": [],
-    "ask": []
-  }
+	"permissions": {
+		"allow": [
+			"Bash(bun run typecheck:*)",
+			"Bash(bun run typecheck:check:*)",
+			"Bash(bun run check:*)",
+			"Bash(bunx shadcn@latest add:*)",
+			"Bash(bun run check:write:*)"
+		],
+		"deny": [],
+		"ask": []
+	}
 }
