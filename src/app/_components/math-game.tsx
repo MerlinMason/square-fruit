@@ -208,7 +208,7 @@ export default function MathGame() {
                   className="w-full"
                 />
                 <p className="text-center text-blue-600/70 text-xs sm:text-sm">
-                  ✨ Pick numbers from 1 to {config.maxNumber} ✨
+                  ✨ Play with numbers from 1 to {config.maxNumber} ✨
                 </p>
               </div>
 
