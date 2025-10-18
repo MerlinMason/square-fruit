@@ -1,19 +1,38 @@
-# Create T3 App
+# Square Fruit
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+A kawaii-styled mathematics game designed for children (ages 7+). Players match pairs of numbers on a grid to solve target equations, progressively revealing colorful reward images.
 
-## What's next? How do I make an app with this?
+## Game Overview
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+Square Fruit teaches arithmetic through an engaging puzzle mechanic:
+- Configure operation mode (addition, subtraction, multiplication, or mixed)
+- Select board size (4×4 to 10×10) and number range (1-100)
+- Match two numbers from the grid to satisfy target equations
+- Complete games to unlock reward images in your collection
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+Built with the [T3 Stack](https://create.t3.gg/) for type-safe, full-stack development.
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+## Tech Stack
+
+### Core Framework
+- **Next.js 15.2.3** - React 19, App Router, Turbopack dev server
+- **TypeScript 5.8.2** - Strict mode with comprehensive type safety
+- **Bun** - Fast package manager and runtime
+
+### Frontend
+- **React 19** with Server Components
+- **Tailwind CSS 4.0** - Utility-first styling with custom kawaii theme
+- **shadcn/ui** - Accessible component primitives
+- **usehooks-ts** - LocalStorage persistence for game state
+
+### Backend (Infrastructure)
+- **tRPC 11.0** - End-to-end type-safe API layer
+- **Drizzle ORM 0.41** - PostgreSQL database toolkit
+- **NextAuth 5.0** - Authentication (Discord provider configured)
+- **Zod 3.24** - Runtime schema validation
+
+### Tooling
+- **Biome 1.9** - Unified linting and formatting (replaces ESLint/Prettier)
 
 ## Learn More
 
