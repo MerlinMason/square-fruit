@@ -1,5 +1,5 @@
 import "@/styles/globals.css";
-
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Poetsen_One } from "next/font/google";
 
@@ -22,6 +22,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
 	return (
 		<html lang="en" className={`${poetsenOne.variable}`}>
+			<Analytics />
 			<body className="font-poetsen">
 				<TRPCReactProvider>{children}</TRPCReactProvider>
 			</body>
