@@ -233,16 +233,9 @@ export default function GameBoard({
 	const secondValue = selectedValues[1];
 
 	return (
-		<div className="container mx-auto max-w-4xl space-y-6 py-8">
-			{/* Floating decoration elements */}
-			<div className="pointer-events-none fixed inset-0 overflow-hidden">
-				<div className="absolute top-20 left-10 h-24 w-24 animate-pulse rounded-full bg-pink-300/20 blur-2xl" />
-				<div className="animation-delay-1000 absolute right-10 bottom-32 h-28 w-28 animate-pulse rounded-full bg-purple-300/20 blur-2xl" />
-				<div className="animation-delay-2000 absolute top-32 left-1/3 h-20 w-20 animate-pulse rounded-full bg-blue-300/20 blur-2xl" />
-			</div>
-
-			{/* Target Display / Completion Message */}
-			<Card className="relative overflow-hidden border-4 border-pink-300 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-8 text-center shadow-2xl">
+		<div className="grid grid-cols-9 gap-14 overflow-hidden p-8">
+			{/* Left Sidebar - Target Display / Completion Message */}
+			<Card className="relative col-span-4 flex min-w-0 flex-1 flex-col overflow-auto border-4 border-pink-300 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-6 text-center shadow-xl">
 				{isComplete ? (
 					<>
 						{/* Completion State */}
@@ -352,8 +345,8 @@ export default function GameBoard({
 				)}
 			</Card>
 
-			{/* Game Board */}
-			<div className="relative rounded-2xl p-1 shadow-2xl">
+			{/* Right Side - Game Board - Square */}
+			<div className="relative col-span-5 aspect-square h-[full]shrink-0 rounded-2xl p-1 shadow-xl">
 				{/* Background image that gets revealed */}
 				<div className="absolute inset-0 overflow-hidden rounded-2xl">
 					{backgroundImage && (
@@ -367,9 +360,10 @@ export default function GameBoard({
 
 				{/* Grid */}
 				<div
-					className="relative grid gap-1"
+					className="relative grid h-full gap-1"
 					style={{
 						gridTemplateColumns: `repeat(${boardSize}, minmax(0, 1fr))`,
+						gridTemplateRows: `repeat(${boardSize}, minmax(0, 1fr))`,
 					}}
 				>
 					{board.map((square) => (
@@ -377,7 +371,7 @@ export default function GameBoard({
 							key={square.id}
 							onClick={() => handleSquareClick(square.id)}
 							disabled={square.revealed}
-							className={`relative aspect-square rounded-lg font-black text-2xl transition-all duration-300${
+							className={`relative rounded-lg font-black text-2xl transition-all duration-300 ${
 								square.revealed
 									? "cursor-default border-0 bg-transparent text-transparent shadow-none"
 									: celebratingSquares.includes(square.id)
@@ -385,8 +379,7 @@ export default function GameBoard({
 										: selectedSquares.includes(square.id)
 											? "z-10 scale-110 border-4 border-pink-400 bg-pink-100/90 shadow-2xl shadow-pink-400/50 ring-4 ring-pink-300 backdrop-blur-sm"
 											: "border-4 border-white/80 bg-white/90 shadow-lg backdrop-blur-md hover:scale-105 hover:border-pink-300 hover:bg-white/95 hover:shadow-pink-200 hover:shadow-xl active:scale-95"
-							}
-							`}
+							}`}
 							type="button"
 						>
 							{!square.revealed && (
@@ -409,17 +402,6 @@ export default function GameBoard({
 						</button>
 					))}
 				</div>
-			</div>
-
-			{/* Instructions */}
-			<div className="text-center">
-				<p className="font-bold text-lg text-purple-600">
-					✨ Click two squares that match the target! ✨
-				</p>
-				<p className="mt-1 text-pink-500 text-sm">
-					{board.filter((sq) => sq.revealed).length} / {totalSquares} revealed
-					🌈
-				</p>
 			</div>
 		</div>
 	);

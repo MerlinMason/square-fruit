@@ -3,7 +3,8 @@
     "allow": [
       "Bash(bun run typecheck:*)",
       "Bash(bun run typecheck:check:*)",
-      "Bash(bun run check:*)"
+      "Bash(bun run check:*)",
+      "Bash(bunx shadcn@latest add:*)"
     ],
     "deny": [],
     "ask": []

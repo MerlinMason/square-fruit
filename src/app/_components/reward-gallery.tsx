@@ -1,35 +1,91 @@
 "use client";
 
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
 
 type RewardGalleryProps = {
 	unlockedImages: number[];
+	onResetProgress: () => void;
 };
 
 // Constants
 const ALL_REWARD_IMAGES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const THUMBNAIL_ASPECT_RATIO = "12.8/9";
 
-export default function RewardGallery({ unlockedImages }: RewardGalleryProps) {
+export default function RewardGallery({
+	unlockedImages,
+	onResetProgress,
+}: RewardGalleryProps) {
 	const [selectedImage, setSelectedImage] = useState<number | null>(null);
 
 	return (
 		<>
 			<Card className="border-4 border-purple-300 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 shadow-xl">
 				<CardHeader>
-					<div className="flex items-center gap-4">
-						<div className="flex h-24 w-24 flex-shrink-0 items-center justify-center text-7xl">
-							🏆
+					<div className="flex items-center justify-between gap-4">
+						<div className="flex items-center gap-4">
+							<div className="flex h-24 w-24 flex-shrink-0 items-center justify-center text-7xl">
+								🏆
+							</div>
+							<div className="flex flex-col">
+								<CardTitle className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text font-bold text-4xl text-transparent">
+									Reward Gallery
+								</CardTitle>
+								<p className="font-medium text-lg text-purple-600">
+									{unlockedImages.length} / {ALL_REWARD_IMAGES.length} collected
+								</p>
+							</div>
 						</div>
-						<div className="flex flex-col">
-							<CardTitle className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text font-bold text-4xl text-transparent">
-								Reward Gallery
-							</CardTitle>
-							<p className="font-medium text-lg text-purple-600">
-								{unlockedImages.length} / {ALL_REWARD_IMAGES.length} collected
-							</p>
-						</div>
+
+						{/* Reset Progress Button */}
+						<AlertDialog>
+							<AlertDialogTrigger asChild>
+								<Button
+									variant="outline"
+									size="sm"
+									className="cursor-pointer border-2 border-red-300 text-red-600 hover:border-red-400 hover:bg-red-50"
+								>
+									🔄 Reset
+								</Button>
+							</AlertDialogTrigger>
+							<AlertDialogContent className="border-4 border-pink-300 bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+								<AlertDialogHeader>
+									<AlertDialogTitle className="text-2xl">
+										⚠️{" "}
+										<span className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
+											Reset Progress?
+										</span>
+									</AlertDialogTitle>
+									<AlertDialogDescription className="text-lg text-purple-600">
+										Are you sure you want to reset all progress? You will lose
+										all unlocked rewards and this cannot be undone.
+									</AlertDialogDescription>
+								</AlertDialogHeader>
+								<AlertDialogFooter>
+									<AlertDialogCancel className="cursor-pointer border-2 border-gray-300 hover:border-gray-400">
+										Cancel
+									</AlertDialogCancel>
+									<AlertDialogAction
+										onClick={onResetProgress}
+										className="cursor-pointer bg-gradient-to-r from-red-400 to-red-600 text-white hover:from-red-500 hover:to-red-700"
+									>
+										Reset Progress
+									</AlertDialogAction>
+								</AlertDialogFooter>
+							</AlertDialogContent>
+						</AlertDialog>
 					</div>
 				</CardHeader>
 				<CardContent className="space-y-4">

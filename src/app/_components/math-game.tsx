@@ -93,6 +93,10 @@ export default function MathGame() {
 		setGameState("config");
 	};
 
+	const handleResetProgress = () => {
+		setUnlockedImages([]);
+	};
+
 	if (gameState === "config") {
 		return (
 			<div className="container mx-auto min-h-screen p-4 py-8">
@@ -256,7 +260,10 @@ export default function MathGame() {
 					</Card>
 
 					{/* Reward Gallery */}
-					<RewardGallery unlockedImages={unlockedImages} />
+					<RewardGallery
+						unlockedImages={unlockedImages}
+						onResetProgress={handleResetProgress}
+					/>
 				</div>
 			</div>
 		);
