@@ -252,7 +252,7 @@ export default function GameBoard({
 								<span className="animation-delay-800 animate-bounce">🦄</span>
 							</div>
 							<p className="font-bold text-2xl text-purple-600">
-								Amazing work, Math Boffin! 🌈
+								Amazing work, Math Genius! 🌈
 							</p>
 							<Button
 								onClick={onRestart}
