@@ -16,7 +16,10 @@ type GameBoardProps = {
 	mode: OperationMode;
 	maxNumber: number;
 	boardSize: number;
-	onComplete: () => void;
+	onComplete: (completedImage: number) => void;
+	onRestart: () => void;
+	onExit: () => void;
+	unlockedImages: number[];
 };
 
 // Generate random number between min and max (inclusive)
@@ -67,6 +70,9 @@ export default function GameBoard({
 	maxNumber,
 	boardSize,
 	onComplete,
+	onRestart,
+	onExit,
+	unlockedImages,
 }: GameBoardProps) {
 	const [board, setBoard] = useState<Square[]>([]);
 	const [selectedSquares, setSelectedSquares] = useState<number[]>([]);
@@ -74,8 +80,29 @@ export default function GameBoard({
 	const [currentOperation, setCurrentOperation] = useState<
 		"addition" | "subtraction" | "multiplication"
 	>("addition");
+	const [celebratingSquares, setCelebratingSquares] = useState<number[]>([]);
+	const [backgroundImage, setBackgroundImage] = useState<string>("");
+	const [backgroundImageNumber, setBackgroundImageNumber] = useState<number>(1);
+	const [isComplete, setIsComplete] = useState(false);
 
 	const totalSquares = boardSize * boardSize;
+
+	// Select background image on mount - prioritize unseen images
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Only run once on mount to keep image stable
+	useEffect(() => {
+		const allImages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+		const unseenImages = allImages.filter(
+			(num) => !unlockedImages.includes(num),
+		);
+
+		// If there are unseen images, pick one of those. Otherwise pick random.
+		const availableImages = unseenImages.length > 0 ? unseenImages : allImages;
+		const chosenNumber =
+			availableImages[randomInt(0, availableImages.length - 1)] ?? 1;
+
+		setBackgroundImageNumber(chosenNumber);
+		setBackgroundImage(`/assets/${chosenNumber}.png`);
+	}, []); // Only run once on mount to keep image stable throughout game
 
 	// Initialize board with random numbers
 	useEffect(() => {
@@ -96,23 +123,14 @@ export default function GameBoard({
 
 		const availableSquares = board.filter((sq) => !sq.revealed);
 		if (availableSquares.length === 0) {
-			onComplete();
+			setIsComplete(true);
+			onComplete(backgroundImageNumber);
 			return;
 		}
 
-		// Pick two random unrevealed squares
-		const idx1 = randomInt(0, availableSquares.length - 1);
-		let idx2 = randomInt(0, availableSquares.length - 1);
-		while (idx2 === idx1 && availableSquares.length > 1) {
-			idx2 = randomInt(0, availableSquares.length - 1);
-		}
+		if (availableSquares.length < 2) return;
 
-		const square1 = availableSquares[idx1];
-		const square2 = availableSquares[idx2];
-
-		if (!square1 || !square2) return;
-
-		// Determine operation for this turn
+		// Determine operation for this turn first
 		let operation: "addition" | "subtraction" | "multiplication";
 		if (mode === "all") {
 			const ops: ("addition" | "subtraction" | "multiplication")[] = [
@@ -125,9 +143,33 @@ export default function GameBoard({
 			operation = mode as "addition" | "subtraction" | "multiplication";
 		}
 
+		// Build a list of all possible targets from available squares
+		const possibleTargets: Array<{
+			target: number;
+			square1: Square;
+			square2: Square;
+		}> = [];
+
+		for (let i = 0; i < availableSquares.length; i++) {
+			for (let j = i + 1; j < availableSquares.length; j++) {
+				const sq1 = availableSquares[i];
+				const sq2 = availableSquares[j];
+				if (sq1 && sq2) {
+					const target = calculateTarget(operation, sq1.value, sq2.value);
+					possibleTargets.push({ target, square1: sq1, square2: sq2 });
+				}
+			}
+		}
+
+		if (possibleTargets.length === 0) return;
+
+		// Pick a random valid target from the possibilities
+		const chosen = possibleTargets[randomInt(0, possibleTargets.length - 1)];
+		if (!chosen) return;
+
 		setCurrentOperation(operation);
-		setTarget(calculateTarget(operation, square1.value, square2.value));
-	}, [board, mode, onComplete]);
+		setTarget(chosen.target);
+	}, [board, mode, onComplete, backgroundImageNumber]);
 
 	// Handle square click
 	const handleSquareClick = (squareId: number) => {
@@ -150,7 +192,9 @@ export default function GameBoard({
 						.filter((v): v is number => v !== undefined);
 
 					if (checkAnswer(mode, selectedValues, target, currentOperation)) {
-						// Correct answer! Reveal the squares
+						// Correct answer! Show celebration effect
+						setCelebratingSquares(newSelected);
+
 						setTimeout(() => {
 							setBoard((prev) =>
 								prev.map((sq) =>
@@ -158,7 +202,8 @@ export default function GameBoard({
 								),
 							);
 							setSelectedSquares([]);
-						}, 500);
+							setCelebratingSquares([]);
+						}, 600);
 					}
 				}
 			}
@@ -166,61 +211,215 @@ export default function GameBoard({
 	};
 
 	const operationSymbol = {
-		addition: "+",
-		subtraction: "−",
-		multiplication: "×",
+		addition: "➕",
+		subtraction: "➖",
+		multiplication: "✖️",
 	};
+
+	const operationEmoji = {
+		addition: "🌸",
+		subtraction: "🦋",
+		multiplication: "⭐",
+	};
+
+	// Get selected values for display
+	const selectedValues = selectedSquares.map(
+		(id) => board.find((sq) => sq.id === id)?.value,
+	);
+	const firstValue = selectedValues[0];
+	const secondValue = selectedValues[1];
 
 	return (
 		<div className="container mx-auto max-w-4xl space-y-6 py-8">
-			{/* Target Display */}
-			<Card className="bg-primary p-6 text-center text-primary-foreground shadow-lg">
-				<div className="text-primary-foreground/70 text-sm uppercase tracking-wide">
-					Target
-				</div>
-				<div className="font-bold text-6xl">{target}</div>
-				<div className="mt-2 text-primary-foreground/90 text-sm">
-					Find two numbers that {currentOperation} to {target} (
-					{operationSymbol[currentOperation]})
-				</div>
+			{/* Floating decoration elements */}
+			<div className="pointer-events-none fixed inset-0 overflow-hidden">
+				<div className="absolute top-20 left-10 h-24 w-24 animate-pulse rounded-full bg-pink-300/20 blur-2xl" />
+				<div className="animation-delay-1000 absolute right-10 bottom-32 h-28 w-28 animate-pulse rounded-full bg-purple-300/20 blur-2xl" />
+				<div className="animation-delay-2000 absolute top-32 left-1/3 h-20 w-20 animate-pulse rounded-full bg-blue-300/20 blur-2xl" />
+			</div>
+
+			{/* Target Display / Completion Message */}
+			<Card className="relative overflow-hidden border-4 border-pink-300 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-8 text-center shadow-2xl">
+				{isComplete ? (
+					<>
+						{/* Completion State */}
+						<div className="space-y-4">
+							<div className="text-8xl">🎉</div>
+							<div className="animate-pulse bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text font-bold text-5xl text-transparent">
+								You Did It!
+							</div>
+							<div className="flex justify-center gap-2 text-4xl">
+								<span className="animate-bounce">⭐</span>
+								<span className="animation-delay-200 animate-bounce">✨</span>
+								<span className="animation-delay-400 animate-bounce">🌟</span>
+								<span className="animation-delay-600 animate-bounce">💖</span>
+								<span className="animation-delay-800 animate-bounce">🦄</span>
+							</div>
+							<p className="font-bold text-2xl text-purple-600">
+								Amazing work, Math Boffin! 🌈
+							</p>
+							<Button
+								onClick={onRestart}
+								className="mt-4 h-16 animate-pulse cursor-pointer bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 font-bold text-xl text-white shadow-xl transition-all hover:scale-105 hover:from-pink-500 hover:via-purple-500 hover:to-blue-500"
+								size="lg"
+							>
+								<span className="mr-2">🎮</span>
+								Play Again
+								<span className="ml-2">🎮</span>
+							</Button>
+						</div>
+					</>
+				) : (
+					<>
+						{/* Normal Game State */}
+						{/* Header with Logo and Title */}
+						<div className="mb-6 flex items-center justify-center gap-4">
+							<img
+								src="/assets/logo.webp"
+								alt="Square Fruit Logo"
+								className="h-16 w-auto"
+							/>
+							<div className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text font-bold text-4xl text-transparent">
+								Square Fruit
+							</div>
+							<Button
+								onClick={onExit}
+								variant="outline"
+								size="sm"
+								className="ml-4 cursor-pointer border-2 border-pink-300 bg-white/80 font-semibold text-pink-600 hover:border-pink-400 hover:bg-pink-50"
+							>
+								Exit
+							</Button>
+						</div>
+						<div className="font-bold text-pink-600 text-sm uppercase tracking-wider">
+							Solve the Puzzle!
+						</div>
+
+						{/* Equation Display */}
+						<div className="my-6 flex items-center justify-center gap-4 font-black text-6xl">
+							{/* First Number */}
+							<div className="relative flex items-center gap-2">
+								{selectedSquares.length === 0 && (
+									<span className="animate-bounce text-4xl">👉</span>
+								)}
+								<span
+									className={`min-w-[80px] rounded-2xl border-4 px-4 py-2 transition-all ${
+										firstValue !== undefined
+											? "border-pink-400 bg-gradient-to-br from-pink-100 to-purple-100 text-purple-600"
+											: "border-pink-300 border-dashed bg-white/50 text-pink-300"
+									}`}
+								>
+									{firstValue ?? "?"}
+								</span>
+							</div>
+
+							{/* Operator */}
+							<span className="text-5xl text-purple-500">
+								{operationSymbol[currentOperation]}
+							</span>
+
+							{/* Second Number */}
+							<div className="relative flex items-center gap-2">
+								{selectedSquares.length === 1 && (
+									<span className="animate-bounce text-4xl">👉</span>
+								)}
+								<span
+									className={`min-w-[80px] rounded-2xl border-4 px-4 py-2 transition-all ${
+										secondValue !== undefined
+											? "border-pink-400 bg-gradient-to-br from-pink-100 to-purple-100 text-purple-600"
+											: "border-pink-300 border-dashed bg-white/50 text-pink-300"
+									}`}
+								>
+									{secondValue ?? "?"}
+								</span>
+							</div>
+
+							{/* Equals */}
+							<span className="text-5xl text-purple-500">=</span>
+
+							{/* Target */}
+							<span className="min-w-[80px] rounded-2xl border-4 border-yellow-400 bg-gradient-to-br from-yellow-100 to-pink-100 px-4 py-2 text-transparent shadow-lg">
+								<span className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text">
+									{target}
+								</span>
+							</span>
+						</div>
+
+						<div className="mt-4 font-bold text-purple-600 text-sm">
+							Click squares on the board to fill in the ?s
+						</div>
+					</>
+				)}
 			</Card>
 
 			{/* Game Board */}
-			<div className="relative">
-				{/* Background image placeholder */}
-				<div className="absolute inset-0 rounded-lg bg-gradient-to-br from-yellow-200 via-pink-200 to-purple-300 shadow-xl" />
+			<div className="relative rounded-2xl p-1 shadow-2xl">
+				{/* Background image that gets revealed */}
+				<div className="absolute inset-0 overflow-hidden rounded-2xl">
+					{backgroundImage && (
+						<img
+							src={backgroundImage}
+							alt="Hidden surprise"
+							className="h-full w-full object-cover"
+						/>
+					)}
+				</div>
 
 				{/* Grid */}
 				<div
-					className="relative grid gap-1 rounded-lg bg-black/5 p-2"
-					style={{ gridTemplateColumns: `repeat(${boardSize}, minmax(0, 1fr))` }}
+					className="relative grid gap-1"
+					style={{
+						gridTemplateColumns: `repeat(${boardSize}, minmax(0, 1fr))`,
+					}}
 				>
 					{board.map((square) => (
 						<button
 							key={square.id}
 							onClick={() => handleSquareClick(square.id)}
 							disabled={square.revealed}
-							className={`
-								aspect-square rounded font-bold text-lg transition-all duration-200
-								${
-									square.revealed
-										? "cursor-default border-transparent bg-transparent text-transparent"
+							className={`relative aspect-square rounded-lg font-black text-2xl transition-all duration-300${
+								square.revealed
+									? "cursor-default border-0 bg-transparent text-transparent shadow-none"
+									: celebratingSquares.includes(square.id)
+										? "z-20 scale-125 animate-bounce border-4 border-yellow-400 bg-yellow-100/90 shadow-2xl shadow-yellow-400/50 ring-4 ring-yellow-300 backdrop-blur-sm"
 										: selectedSquares.includes(square.id)
-											? "scale-95 border-2 border-blue-600 bg-blue-50 shadow-lg ring-2 ring-blue-400"
-											: "border-2 border-gray-300 bg-white shadow-sm hover:scale-105 hover:border-blue-400 hover:shadow-md active:scale-95"
-								}
+											? "z-10 scale-110 border-4 border-pink-400 bg-pink-100/90 shadow-2xl shadow-pink-400/50 ring-4 ring-pink-300 backdrop-blur-sm"
+											: "border-4 border-white/80 bg-white/90 shadow-lg backdrop-blur-md hover:scale-105 hover:border-pink-300 hover:bg-white/95 hover:shadow-pink-200 hover:shadow-xl active:scale-95"
+							}
 							`}
 							type="button"
 						>
-							{!square.revealed && square.value}
+							{!square.revealed && (
+								<>
+									<span className="bg-gradient-to-br from-purple-600 to-pink-600 bg-clip-text text-transparent">
+										{square.value}
+									</span>
+									{celebratingSquares.includes(square.id) && (
+										<>
+											<span className="absolute top-0 left-0 animate-ping text-2xl">
+												✨
+											</span>
+											<span className="absolute right-0 bottom-0 animate-ping text-2xl">
+												⭐
+											</span>
+										</>
+									)}
+								</>
+							)}
 						</button>
 					))}
 				</div>
 			</div>
 
 			{/* Instructions */}
-			<div className="text-center text-muted-foreground text-sm">
-				Click two squares to select them. Find pairs that match the target!
+			<div className="text-center">
+				<p className="font-bold text-lg text-purple-600">
+					✨ Click two squares that match the target! ✨
+				</p>
+				<p className="mt-1 text-pink-500 text-sm">
+					{board.filter((sq) => sq.revealed).length} / {totalSquares} revealed
+					🌈
+				</p>
 			</div>
 		</div>
 	);
