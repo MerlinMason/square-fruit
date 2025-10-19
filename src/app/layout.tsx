@@ -20,12 +20,11 @@ const poetsenOne = Poetsen_One({
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`${poetsenOne.variable} bg-gradient-to-br from-pink-200 via-purple-200 to-blue-200 font-poetsen text-foreground`}
-    >
+    <html lang="en">
       <Analytics />
-      <body>
+      <body
+        className={`${poetsenOne.variable} bg-gradient-to-br from-pink-200 via-purple-200 to-blue-200 font-poetsen text-foreground`}
+      >
         <TRPCReactProvider>{children}</TRPCReactProvider>
         <Toaster />
       </body>
