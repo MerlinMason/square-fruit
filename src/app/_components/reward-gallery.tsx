@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
 import { useState } from "react";
 
 type RewardGalleryProps = {
@@ -34,9 +35,7 @@ export default function RewardGallery({ unlockedImages, onResetProgress }: Rewar
         <CardHeader className="space-y-0 p-4 sm:p-6">
           <div className="flex items-start justify-between gap-2">
             <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
-              <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center text-5xl sm:h-24 sm:w-24 sm:text-7xl">
-                🏆
-              </div>
+              <Image src="/assets/rewards.png" alt="Reward trophy" width={96} height={96} />
               <div className="flex min-w-0 flex-1 flex-col">
                 <CardTitle className=" font-bold text-2xl text-pink-700/60 sm:text-4xl">Reward Gallery</CardTitle>
                 <p className="font-medium text-pink-700/60 text-sm sm:text-lg">

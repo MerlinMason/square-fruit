@@ -277,9 +277,7 @@ export default function GameBoard({
             {/* Header with Logo and Title */}
             <div className="mb-3 flex flex-wrap items-center justify-center gap-2 sm:mb-4 sm:gap-4">
               <img src="/assets/logo.webp" alt="Square Fruit Logo" className="h-12 w-auto sm:h-16" />
-              <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text font-bold text-2xl text-transparent sm:text-4xl">
-                Square Fruit
-              </div>
+              <div className=" font-bold text-2xl text-pink-700/60 sm:text-4xl">Square Fruit</div>
               <Button
                 onClick={onExit}
                 variant="outline"
@@ -338,9 +336,7 @@ export default function GameBoard({
             >
               {!square.revealed && (
                 <>
-                  <span className="bg-gradient-to-br from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    {square.value}
-                  </span>
+                  <span className="text-pink-700/60">{square.value}</span>
                   {celebratingSquares.includes(square.id) && (
                     <>
                       <span className="absolute top-0 left-0 animate-ping text-xl sm:text-2xl">✨</span>

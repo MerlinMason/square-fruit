@@ -128,7 +128,7 @@ export default function EquationDisplay({
         </span>
       </div>
 
-      <div className="mt-3 font-bold text-purple-600 text-xs sm:mt-4 sm:text-sm">
+      <div className="mt-3 font-bold text-pink-700/60 text-xs sm:mt-4 sm:text-sm">
         {currentOperation === "multiplication"
           ? "Click the square that makes the equation correct!"
           : "Click squares on the board to fill in the ?s"}
