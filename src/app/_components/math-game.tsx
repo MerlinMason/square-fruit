@@ -104,14 +104,8 @@ export default function MathGame() {
   if (gameState === "config") {
     return (
       <div className="container mx-auto min-h-screen p-4 sm:p-4 sm:py-8">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-10 h-32 w-32 animate-pulse rounded-full bg-pink-300/30 blur-3xl" />
-          <div className="animation-delay-1000 absolute right-10 bottom-20 h-40 w-40 animate-pulse rounded-full bg-purple-300/30 blur-3xl" />
-          <div className="animation-delay-2000 absolute top-10 left-1/2 h-36 w-36 animate-pulse rounded-full bg-blue-300/30 blur-3xl" />
-        </div>
-
-        <div className="relative grid grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-2">
-          <Card className="border-4 border-pink-200 bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 shadow-2xl">
+        <div className="relative grid grid-cols-1 gap-3 sm:gap-8 lg:grid-cols-2">
+          <Card className="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
             <CardHeader className="p-4 sm:p-6">
               <div className="flex items-center gap-2 sm:gap-4">
                 <img src="/assets/logo.webp" alt="Square Fruit Logo" className="h-16 w-auto flex-shrink-0 sm:h-24" />
@@ -126,7 +120,9 @@ export default function MathGame() {
             <CardContent className="space-y-4 p-4 sm:space-y-8 sm:p-6">
               {/* Operation Mode Selection */}
               <div className="space-y-3 sm:space-y-4">
-                <h3 className="font-bold text-base text-pink-600 sm:text-lg">🎀 Choose Your Challenge</h3>
+                <h3 className="font-bold text-base sm:text-lg">
+                  🎀 <span className="text-pink-700/60">Choose Your Challenge</span>
+                </h3>
                 <div className="grid grid-cols-2 gap-2 sm:gap-4">
                   <Button
                     variant={config.mode === "addition" ? "default" : "outline"}
@@ -178,7 +174,9 @@ export default function MathGame() {
               {/* Times Tables Selection - Only show for multiplication modes */}
               {(config.mode === "multiplication" || config.mode === "all") && (
                 <div className="space-y-3 rounded-2xl bg-white/60 p-4 backdrop-blur-sm sm:space-y-4 sm:p-6">
-                  <h3 className="font-bold text-base text-blue-600 sm:text-lg">✖️ Times Tables to Practice</h3>
+                  <h3 className="font-bold text-base sm:text-lg">
+                    ✖️ <span className="text-pink-700/60">Times Tables to Practice</span>
+                  </h3>
                   <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3">
                     {[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((num) => {
                       const isSelected = config.selectedTimesTables?.includes(num) ?? false;
@@ -202,19 +200,16 @@ export default function MathGame() {
                           }}
                           className={`relative cursor-pointer overflow-hidden rounded-2xl border-2 p-3 font-bold text-base transition-all duration-200 sm:p-4 sm:text-lg ${
                             isSelected
-                              ? "scale-105 border-blue-400 bg-gradient-to-br from-blue-200 via-cyan-100 to-blue-200 text-blue-700 shadow-blue-300/50 shadow-lg"
-                              : "border-blue-200/50 bg-white/90 text-blue-300 hover:scale-105 hover:border-blue-300 hover:bg-gradient-to-br hover:from-blue-50 hover:to-cyan-50 hover:shadow-md"
+                              ? "scale-105 border-pink-200 bg-pink-200 text-pink-700/60"
+                              : "border-pink-200/50 bg-white/90 text-pink-700/40 hover:scale-105 hover:border-blue-300 hover:bg-gradient-to-br hover:from-blue-50 hover:to-cyan-50 hover:shadow-md"
                           }`}
                         >
-                          <span className="relative">
-                            {isSelected && <span className="mr-1 text-base">✓</span>}
-                            {num}×
-                          </span>
+                          <span className="relative">{num}×</span>
                         </button>
                       );
                     })}
                   </div>
-                  <p className="text-center text-blue-600/70 text-xs sm:text-sm">
+                  <p className="text-center text-pink-700/60 text-xs sm:text-sm">
                     ✨{" "}
                     {(config.selectedTimesTables?.length ?? 0) > 0
                       ? `Practicing: ${config.selectedTimesTables?.join(", ")}`
@@ -227,8 +222,10 @@ export default function MathGame() {
               {/* Board Size Selection */}
               <div className="space-y-4 rounded-2xl bg-white/60 p-4 backdrop-blur-sm sm:p-6">
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="font-bold text-base text-purple-600 sm:text-lg">🎨 Board Size</h3>
-                  <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-gradient-to-r from-purple-400 to-pink-400 px-3 py-1 font-bold text-lg text-white shadow-lg sm:px-4 sm:py-2 sm:text-2xl">
+                  <h3 className="font-bold text-base sm:text-lg">
+                    🎨 <span className="text-pink-700/60">Board Size</span>
+                  </h3>
+                  <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-pink-200 px-3 py-1 font-bold text-lg text-pink-700/60 sm:px-4 sm:py-2 sm:text-2xl">
                     {config.boardSize} × {config.boardSize}
                   </span>
                 </div>
@@ -248,7 +245,7 @@ export default function MathGame() {
                   step={BOARD_SIZE_STEP}
                   className="w-full"
                 />
-                <p className="text-center text-purple-600/70 text-xs sm:text-sm">
+                <p className="text-center text-pink-700/60 text-xs sm:text-sm">
                   ✨ {config.boardSize * config.boardSize} magical squares ✨
                 </p>
               </div>
@@ -256,8 +253,10 @@ export default function MathGame() {
               {/* Number Range Selection */}
               <div className="space-y-4 rounded-2xl bg-white/60 p-4 backdrop-blur-sm sm:p-6">
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="font-bold text-base text-blue-600 sm:text-lg">🔢 Numbers</h3>
-                  <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-gradient-to-r from-blue-400 to-purple-400 px-3 py-1 font-bold text-lg text-white shadow-lg sm:px-4 sm:py-2 sm:text-2xl">
+                  <h3 className="font-bold text-base sm:text-lg">
+                    🔢 <span className="text-pink-700/60">Numbers</span>
+                  </h3>
+                  <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-pink-200 px-3 py-1 font-bold text-lg text-pink-700/60 sm:px-4 sm:py-2 sm:text-2xl">
                     1 - {config.maxNumber}
                   </span>
                 </div>
@@ -274,7 +273,7 @@ export default function MathGame() {
                   step={1}
                   className="w-full"
                 />
-                <p className="text-center text-blue-600/70 text-xs sm:text-sm">
+                <p className="text-center text-pink-700/60 text-xs sm:text-sm">
                   ✨ Play with numbers from 1 to {config.maxNumber} ✨
                 </p>
               </div>

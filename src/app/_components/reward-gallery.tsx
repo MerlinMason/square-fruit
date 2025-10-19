@@ -86,7 +86,9 @@ export default function RewardGallery({ unlockedImages, onResetProgress }: Rewar
           </div>
         </CardHeader>
         <CardContent className="space-y-3 p-4 sm:space-y-4 sm:p-6">
-          <h3 className="font-bold text-base text-purple-600 sm:text-lg">🔑 Can you unlock every one?</h3>
+          <h3 className="font-bold text-base sm:text-lg">
+            🔑 <span className="text-pink-700/60">Can you unlock every one?</span>
+          </h3>
           <div className="grid grid-cols-3 gap-2 sm:gap-3">
             {ALL_REWARD_IMAGES.map((imageNum) => {
               const isUnlocked = unlockedImages.includes(imageNum);
