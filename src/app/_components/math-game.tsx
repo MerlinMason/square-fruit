@@ -105,8 +105,8 @@ export default function MathGame() {
   if (gameState === "config") {
     return (
       <div className="container mx-auto min-h-screen p-4 sm:p-4 sm:py-8">
-        <div className="relative grid grid-cols-1 gap-3 sm:gap-8 lg:grid-cols-2">
-          <Card className="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+        <div className="relative grid grid-cols-1 gap-3 sm:gap-12 lg:grid-cols-2">
+          <Card>
             <CardHeader className="p-4 sm:p-6">
               <div className="flex items-center gap-2 sm:gap-4">
                 <img src="/assets/logo.webp" alt="Square Fruit Logo" className="h-16 w-auto flex-shrink-0 sm:h-24" />
@@ -128,7 +128,7 @@ export default function MathGame() {
                     onClick={() => setConfig({ ...config, mode: "addition" })}
                     className={`h-16 cursor-pointer font-bold text-base transition-all sm:h-20 sm:text-lg ${
                       config.mode === "addition"
-                        ? "bg-gradient-to-br from-pink-400 to-pink-600 shadow-lg shadow-pink-300 hover:from-pink-500 hover:to-pink-700"
+                        ? "bg-gradient-to-br from-pink-400 to-pink-600 hover:from-pink-500 hover:to-pink-700"
                         : "border-2 border-pink-200 hover:border-pink-400 hover:bg-pink-50"
                     }`}
                   >
@@ -139,7 +139,7 @@ export default function MathGame() {
                     onClick={() => setConfig({ ...config, mode: "subtraction" })}
                     className={`h-16 cursor-pointer font-bold text-base transition-all sm:h-20 sm:text-lg ${
                       config.mode === "subtraction"
-                        ? "bg-gradient-to-br from-purple-400 to-purple-600 shadow-lg shadow-purple-300 hover:from-purple-500 hover:to-purple-700"
+                        ? "bg-gradient-to-br from-purple-400 to-purple-600 hover:from-purple-500 hover:to-purple-700"
                         : "border-2 border-purple-200 hover:border-purple-400 hover:bg-purple-50"
                     }`}
                   >
@@ -150,7 +150,7 @@ export default function MathGame() {
                     onClick={() => setConfig({ ...config, mode: "multiplication" })}
                     className={`h-16 cursor-pointer font-bold text-base transition-all sm:h-20 sm:text-lg ${
                       config.mode === "multiplication"
-                        ? "bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-300 shadow-lg hover:from-blue-500 hover:to-blue-700"
+                        ? "bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700"
                         : "border-2 border-blue-200 hover:border-blue-400 hover:bg-blue-50"
                     }`}
                   >
@@ -161,7 +161,7 @@ export default function MathGame() {
                     onClick={() => setConfig({ ...config, mode: "all" })}
                     className={`h-16 cursor-pointer font-bold text-base transition-all sm:h-20 sm:text-lg ${
                       config.mode === "all"
-                        ? "bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 shadow-lg shadow-purple-300 hover:from-pink-500 hover:via-purple-500 hover:to-blue-500"
+                        ? "bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 hover:from-pink-500 hover:via-purple-500 hover:to-blue-500"
                         : "border-2 border-pink-200 hover:border-pink-400 hover:bg-gradient-to-br hover:from-pink-50 hover:to-purple-50"
                     }`}
                   >
@@ -276,7 +276,7 @@ export default function MathGame() {
               {/* Start Button */}
               <Button
                 onClick={handleStartGame}
-                className="h-14 w-full cursor-pointer bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 font-bold text-white text-xl shadow-xl transition-all hover:scale-103 hover:from-pink-500 hover:via-purple-500 hover:to-blue-500 hover:shadow-2xl sm:h-16 sm:text-2xl"
+                className="h-14 w-full cursor-pointer bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 font-bold text-white text-xl transition-all hover:scale-103 hover:from-pink-500 hover:via-purple-500 hover:to-blue-500 hover:shadow-xl sm:h-16 sm:text-2xl"
                 size="lg"
               >
                 <span className="mr-1 sm:mr-2">🌟</span>

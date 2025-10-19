@@ -262,7 +262,7 @@ export default function GameBoard({
   return (
     <div className="container mx-auto flex min-h-screen flex-col gap-4 p-4 md:flex-row md:items-start md:gap-6 md:p-8">
       {/* Left Sidebar - Target Display / Completion Message - 2/5 width on medium+ screens */}
-      <Card className="relative flex min-w-0 flex-col border-4 border-pink-300 bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-4 text-center shadow-xl md:w-2/5 md:shrink-0 md:p-6">
+      <Card className="relative flex min-w-0 flex-col p-4 text-center md:w-2/5 md:shrink-0 md:p-6">
         {isComplete ? (
           <CompletionScreen onRestart={onRestart} />
         ) : (
@@ -298,7 +298,7 @@ export default function GameBoard({
       </Card>
 
       {/* Right Side - Game Board - 3/5 width on medium+ screens */}
-      <div className="relative aspect-square rounded-2xl p-1 shadow-xl md:w-3/5">
+      <div className="relative rounded-2xl p-2 md:w-3/5">
         {/* Background image that gets revealed */}
         <div className="absolute inset-0 overflow-hidden rounded-2xl">
           {backgroundImage && (
@@ -319,7 +319,7 @@ export default function GameBoard({
               key={square.id}
               onClick={() => handleSquareClick(square.id)}
               disabled={square.revealed}
-              className={`relative rounded-md font-black text-lg transition-all duration-300 sm:rounded-lg sm:text-xl lg:text-2xl ${
+              className={`relative aspect-square select-none rounded-md font-black text-lg transition-all duration-300 hover:z-10 sm:rounded-lg sm:text-xl lg:text-2xl ${
                 square.revealed
                   ? "cursor-default border-0 bg-transparent text-transparent shadow-none"
                   : celebratingSquares.includes(square.id)

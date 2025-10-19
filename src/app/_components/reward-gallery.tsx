@@ -30,7 +30,7 @@ export default function RewardGallery({ unlockedImages, onResetProgress }: Rewar
 
   return (
     <>
-      <Card className="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+      <Card>
         <CardHeader className="space-y-0 p-4 sm:p-6">
           <div className="flex items-start justify-between gap-2">
             <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
