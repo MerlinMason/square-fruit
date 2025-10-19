@@ -266,7 +266,7 @@ export default function GameBoard({
   const secondValue = selectedValues[1];
 
   return (
-    <div className="container mx-auto flex min-h-screen flex-col gap-4 p-4 md:flex-row md:items-start md:gap-6 md:p-8">
+    <div className="container mx-auto flex flex-col gap-4 p-4 md:flex-row md:items-start md:gap-6 md:p-8">
       {/* Left Sidebar - Target Display / Completion Message - 2/5 width on medium+ screens */}
       <Card className="relative flex min-w-0 flex-col p-4 text-center md:w-2/5 md:shrink-0 md:p-6">
         {isComplete ? (
