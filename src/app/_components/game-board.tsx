@@ -304,9 +304,9 @@ export default function GameBoard({
       </Card>
 
       {/* Right Side - Game Board - 3/5 width on medium+ screens */}
-      <div className="relative rounded-2xl p-2 md:w-3/5">
+      <div className="relative p-1.5 md:w-3/5">
         {/* Background image that gets revealed */}
-        <div className="absolute inset-0 overflow-hidden rounded-2xl">
+        <div className="absolute inset-0 overflow-hidden rounded-xl">
           {backgroundImage && (
             <img src={backgroundImage} alt="Hidden surprise" className="h-full w-full object-cover" />
           )}
@@ -314,7 +314,7 @@ export default function GameBoard({
 
         {/* Grid */}
         <div
-          className="relative grid h-full gap-1"
+          className="relative grid h-full gap-1.5"
           style={{
             gridTemplateColumns: `repeat(${boardSize}, minmax(0, 1fr))`,
             gridTemplateRows: `repeat(${boardSize}, minmax(0, 1fr))`,
@@ -325,7 +325,7 @@ export default function GameBoard({
               key={square.id}
               onClick={() => handleSquareClick(square.id)}
               disabled={square.revealed}
-              className={`relative aspect-square select-none rounded-md font-black text-lg transition-all duration-300 hover:z-10 sm:rounded-lg sm:text-xl lg:text-2xl ${
+              className={`relative aspect-square select-none rounded-md font-black text-lg transition-all duration-300 hover:z-10 sm:text-xl lg:text-2xl ${
                 square.revealed
                   ? "cursor-default border-0 bg-transparent text-transparent shadow-none"
                   : celebratingSquares.includes(square.id)
