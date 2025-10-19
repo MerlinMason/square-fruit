@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import CompletionScreen from "./completion-screen";
 import EquationDisplay from "./equation-display";
 import { ALL_REWARD_IMAGES } from "./reward-gallery";
+import { toast } from "sonner";
 
 type OperationMode = "addition" | "subtraction" | "multiplication" | "all";
 
@@ -248,6 +249,11 @@ export default function GameBoard({
               setSelectedSquares([]);
               setCelebratingSquares([]);
             }, CELEBRATION_DELAY);
+          } else {
+            toast.error("Oops! That's not quite right 😿 Try again!");
+            setTimeout(() => {
+              setSelectedSquares([]);
+            }, CELEBRATION_DELAY);
           }
         }
       }
@@ -323,9 +329,9 @@ export default function GameBoard({
                 square.revealed
                   ? "cursor-default border-0 bg-transparent text-transparent shadow-none"
                   : celebratingSquares.includes(square.id)
-                    ? "z-20 scale-125 animate-bounce border-2 border-yellow-400 bg-yellow-100/90 shadow-xl shadow-yellow-400/50 ring-2 ring-yellow-300 backdrop-blur-sm sm:border-4 sm:shadow-2xl sm:ring-4"
+                    ? "z-20 scale-105 animate-bounce border-2 border-yellow-400 bg-yellow-100/90 shadow-xl shadow-yellow-400/50 ring-2 ring-yellow-300 backdrop-blur-sm sm:border-4 sm:shadow-2xl sm:ring-4"
                     : selectedSquares.includes(square.id)
-                      ? "z-10 scale-110 border-2 border-pink-400 bg-pink-100/90 shadow-pink-400/50 shadow-xl ring-2 ring-pink-300 backdrop-blur-sm sm:border-4 sm:shadow-2xl sm:ring-4"
+                      ? "z-10 scale-105 border-2 border-pink-400 bg-pink-100/90 shadow-pink-400/50 shadow-xl ring-2 ring-pink-300 backdrop-blur-sm sm:border-4 sm:shadow-2xl sm:ring-4"
                       : "border-2 border-white/80 bg-white/90 shadow-md backdrop-blur-md hover:scale-105 hover:border-pink-300 hover:bg-white/95 hover:shadow-lg hover:shadow-pink-200 active:scale-95 sm:border-4 sm:shadow-lg sm:hover:shadow-xl"
               }`}
               type="button"
