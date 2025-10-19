@@ -1,5 +1,6 @@
 "use client";
 
+import SectionHeading from "@/app/_components/section-heading";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,7 +30,7 @@ export default function RewardGallery({ unlockedImages, onResetProgress }: Rewar
 
   return (
     <>
-      <Card className="border-4 border-purple-300 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 shadow-xl">
+      <Card className="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
         <CardHeader className="space-y-0 p-4 sm:p-6">
           <div className="flex items-start justify-between gap-2">
             <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
@@ -37,10 +38,8 @@ export default function RewardGallery({ unlockedImages, onResetProgress }: Rewar
                 🏆
               </div>
               <div className="flex min-w-0 flex-1 flex-col">
-                <CardTitle className="bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text font-bold text-2xl text-transparent sm:text-4xl">
-                  Reward Gallery
-                </CardTitle>
-                <p className="font-medium text-purple-600 text-sm sm:text-lg">
+                <CardTitle className=" font-bold text-2xl text-pink-700/60 sm:text-4xl">Reward Gallery</CardTitle>
+                <p className="font-medium text-pink-700/60 text-sm sm:text-lg">
                   {unlockedImages.length} / {ALL_REWARD_IMAGES.length} collected
                 </p>
               </div>
@@ -60,12 +59,9 @@ export default function RewardGallery({ unlockedImages, onResetProgress }: Rewar
               <AlertDialogContent className="border-4 border-pink-300 bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
                 <AlertDialogHeader>
                   <AlertDialogTitle className="text-2xl">
-                    ⚠️{" "}
-                    <span className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
-                      Reset Progress?
-                    </span>
-                  </AlertDialogTitle>
-                  <AlertDialogDescription className="text-lg text-purple-600">
+                    ⚠️ <span className="text-pink-700/80"> Reset Progress? </span>{" "}
+                  </AlertDialogTitle>{" "}
+                  <AlertDialogDescription className="text-lg text-pink-700/60">
                     Are you sure you want to reset all progress? You will lose all unlocked rewards and this cannot be
                     undone.
                   </AlertDialogDescription>
@@ -86,9 +82,7 @@ export default function RewardGallery({ unlockedImages, onResetProgress }: Rewar
           </div>
         </CardHeader>
         <CardContent className="space-y-3 p-4 sm:space-y-4 sm:p-6">
-          <h3 className="font-bold text-base sm:text-lg">
-            🔑 <span className="text-pink-700/60">Can you unlock every one?</span>
-          </h3>
+          <SectionHeading emoji="🔑">Can you unlock every one?</SectionHeading>
           <div className="grid grid-cols-3 gap-2 sm:gap-3">
             {ALL_REWARD_IMAGES.map((imageNum) => {
               const isUnlocked = unlockedImages.includes(imageNum);
@@ -97,10 +91,10 @@ export default function RewardGallery({ unlockedImages, onResetProgress }: Rewar
                   key={imageNum}
                   onClick={() => isUnlocked && setSelectedImage(imageNum)}
                   disabled={!isUnlocked}
-                  className={`relative overflow-hidden rounded-lg border-2 transition-all sm:rounded-xl sm:border-4 ${
+                  className={`relative overflow-hidden rounded-lg border-1 transition-all sm:rounded-xl sm:border-4 ${
                     isUnlocked
                       ? "cursor-pointer border-pink-300 bg-white shadow-lg hover:scale-105 hover:shadow-xl"
-                      : "cursor-not-allowed border-gray-300 bg-gray-200"
+                      : "cursor-not-allowed border-pink-200 bg-pink-50"
                   }`}
                   style={{ aspectRatio: THUMBNAIL_ASPECT_RATIO }}
                   type="button"
@@ -112,9 +106,7 @@ export default function RewardGallery({ unlockedImages, onResetProgress }: Rewar
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center text-2xl text-gray-400 sm:text-4xl">
-                      🔒
-                    </div>
+                    <div className="flex h-full w-full items-center justify-center text-2xl sm:text-4xl">🔒</div>
                   )}
                 </button>
               );

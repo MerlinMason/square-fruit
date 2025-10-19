@@ -40,7 +40,7 @@ function Slider({
         <SliderPrimitive.Range
           data-slot="slider-range"
           className={cn(
-            "absolute bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full",
+            "absolute bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full",
           )}
         />
       </SliderPrimitive.Track>
@@ -49,7 +49,7 @@ function Slider({
           data-slot="slider-thumb"
           // biome-ignore lint/suspicious/noArrayIndexKey: Slider thumbs don't reorder
           key={index}
-          className="block size-8 shrink-0 cursor-grab rounded-full border-4 border-white bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 shadow-lg ring-4 ring-pink-200/50 transition-all duration-150 hover:scale-110 hover:shadow-xl hover:ring-pink-300 focus-visible:scale-110 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-pink-300 active:scale-125 active:cursor-grabbing active:shadow-2xl disabled:pointer-events-none disabled:opacity-50"
+          className="block size-8 shrink-0 cursor-grab rounded-full border-4 border-white bg-gradient-to-br from-pink-300 via-purple-300 to-blue-300 shadow-lg ring-4 ring-pink-200/50 transition-all duration-150 hover:scale-110 hover:shadow-xl hover:ring-pink-300 focus-visible:scale-110 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-pink-300 active:scale-120 active:cursor-grabbing active:shadow-2xl disabled:pointer-events-none disabled:opacity-50"
         />
       ))}
     </SliderPrimitive.Root>

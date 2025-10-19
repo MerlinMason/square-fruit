@@ -2,6 +2,7 @@
 
 import GameBoard from "@/app/_components/game-board";
 import RewardGallery from "@/app/_components/reward-gallery";
+import SectionHeading from "@/app/_components/section-heading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
@@ -56,7 +57,7 @@ export default function MathGame() {
   if (!isMounted) {
     return (
       <div className="container mx-auto flex min-h-screen items-center justify-center p-2 sm:p-4">
-        <Card className="w-full max-w-2xl border-4 border-pink-200 bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 shadow-2xl">
+        <Card className="w-full max-w-2xl bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
           <CardHeader className="p-4 sm:p-6">
             <div className="flex items-center gap-2 sm:gap-4">
               <img src="/assets/logo.webp" alt="Square Fruit Logo" className="h-16 w-auto flex-shrink-0 sm:h-24" />
@@ -110,19 +111,17 @@ export default function MathGame() {
               <div className="flex items-center gap-2 sm:gap-4">
                 <img src="/assets/logo.webp" alt="Square Fruit Logo" className="h-16 w-auto flex-shrink-0 sm:h-24" />
                 <div className="flex flex-col">
-                  <CardTitle className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text font-bold text-2xl text-transparent sm:text-4xl">
-                    Square Fruit
-                  </CardTitle>
-                  <p className="font-medium text-purple-500 text-sm sm:text-lg">✨ Magical Maths Game ✨</p>
+                  <CardTitle className=" font-bold text-2xl text-pink-700/60 sm:text-4xl">Square Fruit</CardTitle>
+                  <p className="font-medium text-sm sm:text-lg">
+                    ✨ <span className="text-pink-700/60">Magical Maths Game</span> ✨
+                  </p>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4 p-4 sm:space-y-8 sm:p-6">
               {/* Operation Mode Selection */}
               <div className="space-y-3 sm:space-y-4">
-                <h3 className="font-bold text-base sm:text-lg">
-                  🎀 <span className="text-pink-700/60">Choose Your Challenge</span>
-                </h3>
+                <SectionHeading emoji="🎀">Choose Your Challenge</SectionHeading>
                 <div className="grid grid-cols-2 gap-2 sm:gap-4">
                   <Button
                     variant={config.mode === "addition" ? "default" : "outline"}
@@ -201,7 +200,7 @@ export default function MathGame() {
                           className={`relative cursor-pointer overflow-hidden rounded-2xl border-2 p-3 font-bold text-base transition-all duration-200 sm:p-4 sm:text-lg ${
                             isSelected
                               ? "scale-105 border-pink-200 bg-pink-200 text-pink-700/60"
-                              : "border-pink-200/50 bg-white/90 text-pink-700/40 hover:scale-105 hover:border-blue-300 hover:bg-gradient-to-br hover:from-blue-50 hover:to-cyan-50 hover:shadow-md"
+                              : "border-pink-200/50 bg-white/90 text-pink-700/40 hover:scale-105 hover:border-pink-300 hover:shadow-md"
                           }`}
                         >
                           <span className="relative">{num}×</span>
@@ -222,9 +221,7 @@ export default function MathGame() {
               {/* Board Size Selection */}
               <div className="space-y-4 rounded-2xl bg-white/60 p-4 backdrop-blur-sm sm:p-6">
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="font-bold text-base sm:text-lg">
-                    🎨 <span className="text-pink-700/60">Board Size</span>
-                  </h3>
+                  <SectionHeading emoji="🎨">Board Size</SectionHeading>
                   <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-pink-200 px-3 py-1 font-bold text-lg text-pink-700/60 sm:px-4 sm:py-2 sm:text-2xl">
                     {config.boardSize} × {config.boardSize}
                   </span>
@@ -253,9 +250,7 @@ export default function MathGame() {
               {/* Number Range Selection */}
               <div className="space-y-4 rounded-2xl bg-white/60 p-4 backdrop-blur-sm sm:p-6">
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="font-bold text-base sm:text-lg">
-                    🔢 <span className="text-pink-700/60">Numbers</span>
-                  </h3>
+                  <SectionHeading emoji="🔢">Numbers</SectionHeading>
                   <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-pink-200 px-3 py-1 font-bold text-lg text-pink-700/60 sm:px-4 sm:py-2 sm:text-2xl">
                     1 - {config.maxNumber}
                   </span>
@@ -281,7 +276,7 @@ export default function MathGame() {
               {/* Start Button */}
               <Button
                 onClick={handleStartGame}
-                className="h-14 w-full animate-pulse cursor-pointer bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 font-bold text-white text-xl shadow-xl transition-all hover:scale-105 hover:from-pink-500 hover:via-purple-500 hover:to-blue-500 hover:shadow-2xl sm:h-16 sm:text-2xl"
+                className="h-14 w-full cursor-pointer bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 font-bold text-white text-xl shadow-xl transition-all hover:scale-103 hover:from-pink-500 hover:via-purple-500 hover:to-blue-500 hover:shadow-2xl sm:h-16 sm:text-2xl"
                 size="lg"
               >
                 <span className="mr-1 sm:mr-2">🌟</span>
