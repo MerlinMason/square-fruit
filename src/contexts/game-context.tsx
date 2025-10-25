@@ -1,11 +1,11 @@
 "use client";
 
-import { createContext, useContext, useEffect, useReducer, type ReactNode } from "react";
-import { useLocalStorage } from "usehooks-ts";
-import { toast } from "sonner";
 import { checkAnswer } from "@/lib/answer-validation";
 import { createBoard, selectBackgroundImage } from "@/lib/board-setup";
 import { generateTarget } from "@/lib/target-generation";
+import { type ReactNode, createContext, useContext, useEffect, useReducer, useState } from "react";
+import { toast } from "sonner";
+import { useLocalStorage } from "usehooks-ts";
 
 // ============================================================================
 // Types
@@ -67,6 +67,13 @@ type GameAction =
 // Constants
 // ============================================================================
 
+export const BOARD_SIZE_MIN = 4;
+export const BOARD_SIZE_MAX = 10;
+export const BOARD_SIZE_STEP = 2;
+export const NUMBER_RANGE_MIN = 1;
+export const NUMBER_RANGE_MAX = 100;
+export const TIMES_TABLES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
 export const DEFAULT_CONFIG: GameConfig = {
   mode: "addition",
   maxNumber: 12,
@@ -76,6 +83,12 @@ export const DEFAULT_CONFIG: GameConfig = {
 
 export const ALL_REWARD_IMAGES = Array.from({ length: 12 }, (_, i) => i + 1);
 
+// LocalStorage keys
+const STORAGE_KEYS = {
+  CONFIG: "square-fruit-config",
+  UNLOCKED: "square-fruit-unlocked",
+} as const;
+
 // ============================================================================
 // Reducer Helpers
 // ============================================================================
@@ -83,6 +96,11 @@ export const ALL_REWARD_IMAGES = Array.from({ length: 12 }, (_, i) => i + 1);
 const updateConfig = (state: GameState, updates: Partial<GameConfig>): GameState => ({
   ...state,
   config: { ...state.config, ...updates },
+});
+
+const updateGame = (state: GameState, updates: Partial<ActiveGame>): GameState => ({
+  ...state,
+  game: state.game ? { ...state.game, ...updates } : null,
 });
 
 const completeGame = (game: ActiveGame, board: Square[]): ActiveGame => ({
@@ -112,11 +130,17 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
       return updateConfig(state, { selectedTimesTables: action.timesTables });
 
     case "START_GAME": {
+      // Validate times tables selection for multiplication modes
       const needsTimesTables = state.config.mode === "multiplication" || state.config.mode === "all";
-      if (needsTimesTables && state.config.selectedTimesTables.length === 0) return state;
+      if (needsTimesTables && state.config.selectedTimesTables.length === 0) {
+        return state;
+      }
 
+      // Create game board and select background image
       const board = createBoard(state.config.boardSize, state.config.maxNumber);
       const { imageNumber, imageUrl } = selectBackgroundImage(state.unlockedImages, ALL_REWARD_IMAGES);
+
+      // Generate first target
       const targetInfo = generateTarget(board, state.config.mode, state.config.selectedTimesTables);
       if (!targetInfo) return state;
 
@@ -144,22 +168,24 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
     case "TOGGLE_SQUARE": {
       if (!state.game || state.game.isComplete) return state;
 
-      const game = state.game;
+      const { game } = state;
       const square = game.board.find((sq) => sq.id === action.squareId);
       if (!square || square.revealed) return state;
 
+      // Deselect if already selected
       if (game.selectedSquares.includes(action.squareId)) {
-        return {
-          ...state,
-          game: { ...game, selectedSquares: game.selectedSquares.filter((id) => id !== action.squareId) },
-        };
+        return updateGame(state, {
+          selectedSquares: game.selectedSquares.filter((id) => id !== action.squareId),
+        });
       }
 
+      // Check max selections
       const maxSelections = game.currentOperation === "multiplication" ? 1 : 2;
       if (game.selectedSquares.length >= maxSelections) return state;
 
       const newSelected = [...game.selectedSquares, action.squareId];
 
+      // Check answer when max selections reached
       if (newSelected.length === maxSelections) {
         const selectedValues = newSelected
           .map((id) => game.board.find((sq) => sq.id === id)?.value)
@@ -168,24 +194,25 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         const isCorrect = checkAnswer(selectedValues, game.target, game.currentOperation, game.multiplicationTable);
 
         if (isCorrect) {
-          return { ...state, game: { ...game, selectedSquares: newSelected, celebratingSquares: newSelected } };
+          return updateGame(state, { selectedSquares: newSelected, celebratingSquares: newSelected });
         }
 
         toast.error("Oops! That's not quite right 😿 Try again!");
-        return { ...state, game: { ...game, selectedSquares: [] } };
+        return updateGame(state, { selectedSquares: [] });
       }
 
-      return { ...state, game: { ...game, selectedSquares: newSelected } };
+      return updateGame(state, { selectedSquares: newSelected });
     }
 
     case "REVEAL_SQUARES": {
       if (!state.game) return state;
 
-      const game = state.game;
+      const { game } = state;
       const newBoard = game.board.map((sq) =>
         game.celebratingSquares.includes(sq.id) ? { ...sq, revealed: true } : sq,
       );
 
+      // Game complete - unlock image
       if (newBoard.every((sq) => sq.revealed)) {
         const imageAlreadyUnlocked = state.unlockedImages.includes(game.backgroundImageNumber);
         return {
@@ -197,19 +224,18 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         };
       }
 
+      // Generate next target
       const targetInfo = generateTarget(newBoard, state.config.mode, state.config.selectedTimesTables);
-      if (!targetInfo) return { ...state, game: completeGame(game, newBoard) };
+      if (!targetInfo) {
+        return { ...state, game: completeGame(game, newBoard) };
+      }
 
-      return {
-        ...state,
-        game: {
-          ...game,
-          board: newBoard,
-          selectedSquares: [],
-          celebratingSquares: [],
-          ...targetInfo,
-        },
-      };
+      return updateGame(state, {
+        board: newBoard,
+        selectedSquares: [],
+        celebratingSquares: [],
+        ...targetInfo,
+      });
     }
 
     case "RESET_PROGRESS":
@@ -247,21 +273,53 @@ type GameProviderProps = {
 };
 
 export const GameProvider = ({ children }: GameProviderProps) => {
-  const [storedConfig, setStoredConfig] = useLocalStorage<GameConfig>("square-fruit-config", DEFAULT_CONFIG);
-  const [storedUnlocked, setStoredUnlocked] = useLocalStorage<number[]>("square-fruit-unlocked", []);
+  const [isMounted, setIsMounted] = useState(false);
+  const [storedConfig, setStoredConfig] = useLocalStorage<GameConfig>(STORAGE_KEYS.CONFIG, DEFAULT_CONFIG);
+  const [storedUnlocked, setStoredUnlocked] = useLocalStorage<number[]>(STORAGE_KEYS.UNLOCKED, []);
 
-  const config = storedConfig.selectedTimesTables
-    ? storedConfig
-    : { ...storedConfig, selectedTimesTables: DEFAULT_CONFIG.selectedTimesTables };
+  // Initialize with defaults to avoid hydration mismatch
+  const [state, dispatch] = useReducer(gameReducer, initialState);
 
-  const [state, dispatch] = useReducer(gameReducer, {
-    ...initialState,
-    config,
-    unlockedImages: storedUnlocked,
-  });
+  // Load stored values on mount
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Only load stored config once on mount to avoid hydration issues
+  useEffect(() => {
+    setIsMounted(true);
 
-  useEffect(() => setStoredConfig(state.config), [state.config, setStoredConfig]);
-  useEffect(() => setStoredUnlocked(state.unlockedImages), [state.unlockedImages, setStoredUnlocked]);
+    // Ensure selectedTimesTables exists (backwards compatibility)
+    const config = {
+      ...storedConfig,
+      selectedTimesTables: storedConfig.selectedTimesTables || DEFAULT_CONFIG.selectedTimesTables,
+    };
+
+    // Apply non-default config values
+    const configUpdates: GameAction[] = [];
+
+    if (config.mode !== DEFAULT_CONFIG.mode) {
+      configUpdates.push({ type: "SET_MODE", mode: config.mode });
+    }
+    if (config.maxNumber !== DEFAULT_CONFIG.maxNumber) {
+      configUpdates.push({ type: "SET_MAX_NUMBER", maxNumber: config.maxNumber });
+    }
+    if (config.boardSize !== DEFAULT_CONFIG.boardSize) {
+      configUpdates.push({ type: "SET_BOARD_SIZE", boardSize: config.boardSize });
+    }
+    if (JSON.stringify(config.selectedTimesTables) !== JSON.stringify(DEFAULT_CONFIG.selectedTimesTables)) {
+      configUpdates.push({ type: "SET_TIMES_TABLES", timesTables: config.selectedTimesTables });
+    }
+
+    for (const action of configUpdates) {
+      dispatch(action);
+    }
+  }, []);
+
+  // Persist state to localStorage after mount
+  useEffect(() => {
+    if (isMounted) setStoredConfig(state.config);
+  }, [state.config, setStoredConfig, isMounted]);
+
+  useEffect(() => {
+    if (isMounted) setStoredUnlocked(state.unlockedImages);
+  }, [state.unlockedImages, setStoredUnlocked, isMounted]);
 
   return <GameContext.Provider value={{ state, dispatch }}>{children}</GameContext.Provider>;
 };

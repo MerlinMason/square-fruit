@@ -1,16 +1,6 @@
 "use client";
 
-type OperationMode = "addition" | "subtraction" | "multiplication";
-
-type EquationDisplayProps = {
-  currentOperation: OperationMode;
-  multiplicationTable: number | null;
-  multiplicationSwapOrder: boolean;
-  selectedSquaresCount: number;
-  firstValue: number | undefined;
-  secondValue: number | undefined;
-  target: number;
-};
+import { useGameContext } from "@/contexts/game-context";
 
 const operationSymbol = {
   addition: "➕",
@@ -18,15 +8,19 @@ const operationSymbol = {
   multiplication: "✖️",
 };
 
-export default function EquationDisplay({
-  currentOperation,
-  multiplicationTable,
-  multiplicationSwapOrder,
-  selectedSquaresCount,
-  firstValue,
-  secondValue,
-  target,
-}: EquationDisplayProps) {
+export default function EquationDisplay() {
+  const { state } = useGameContext();
+  const { game } = state;
+
+  if (!game) return null;
+
+  const { board, selectedSquares, target, currentOperation, multiplicationTable, multiplicationSwapOrder } = game;
+
+  // Get selected values for display
+  const selectedValues = selectedSquares.map((id) => board.find((sq) => sq.id === id)?.value);
+  const firstValue = selectedValues[0];
+  const secondValue = selectedValues[1];
+  const selectedSquaresCount = selectedSquares.length;
   return (
     <>
       {/* Equation Display */}

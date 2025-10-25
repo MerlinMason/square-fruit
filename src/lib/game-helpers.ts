@@ -1,5 +1,4 @@
-export const randomInt = (min: number, max: number): number =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
+export const randomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
 
 export const calculateTarget = (
   op: "addition" | "subtraction" | "multiplication",

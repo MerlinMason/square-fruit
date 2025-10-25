@@ -14,9 +14,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useGameContext } from "@/contexts/game-context";
 import Image from "next/image";
 import { useState } from "react";
-import { useGameContext } from "@/contexts/game-context";
 
 // Constants
 export const ALL_REWARD_IMAGES = Array.from({ length: 12 }, (_, i) => i + 1);
