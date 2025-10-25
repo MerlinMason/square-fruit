@@ -26,7 +26,7 @@ const poetsenOne = Poetsen_One({
   variable: "--font-poetsen",
 });
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
     <html lang="en" className="min-h-[100dvh] bg-gradient-to-br from-pink-200 via-purple-200 to-blue-200">
       <Analytics />
@@ -36,4 +36,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;

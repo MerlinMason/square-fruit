@@ -6,7 +6,7 @@ import RewardGallery from "@/app/_components/reward-gallery";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useGameContext } from "@/contexts/game-context";
 
-export default function MathGame() {
+const MathGame = () => {
   const { state } = useGameContext();
   const { screen } = state;
 
@@ -43,4 +43,6 @@ export default function MathGame() {
   }
 
   return null;
-}
+};
+
+export default MathGame;

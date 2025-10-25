@@ -11,7 +11,7 @@ import EquationDisplay from "./equation-display";
 // Constants
 const CELEBRATION_DELAY = 600;
 
-export default function GameBoard() {
+const GameBoard = () => {
   const { state, dispatch } = useGameContext();
   const { game } = state;
 
@@ -121,4 +121,6 @@ export default function GameBoard() {
       </div>
     </div>
   );
-}
+};
+
+export default GameBoard;

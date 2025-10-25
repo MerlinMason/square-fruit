@@ -2,7 +2,7 @@
 
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function LoadingState() {
+const LoadingState = () => {
   return (
     <div className="container mx-auto flex min-h-screen items-center justify-center p-2 sm:p-4">
       <Card className="w-full max-w-2xl bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
@@ -21,4 +21,6 @@ export default function LoadingState() {
       </Card>
     </div>
   );
-}
+};
+
+export default LoadingState;

@@ -14,7 +14,7 @@ import {
 } from "@/contexts/game-context";
 import { toast } from "sonner";
 
-export default function GameConfig() {
+const GameConfig = () => {
   const { state, dispatch } = useGameContext();
   const { config } = state;
 
@@ -195,4 +195,6 @@ export default function GameConfig() {
       </Button>
     </>
   );
-}
+};
+
+export default GameConfig;

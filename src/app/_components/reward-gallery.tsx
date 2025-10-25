@@ -22,7 +22,7 @@ import { useState } from "react";
 export const ALL_REWARD_IMAGES = Array.from({ length: 12 }, (_, i) => i + 1);
 const THUMBNAIL_ASPECT_RATIO = "12.8/9";
 
-export default function RewardGallery() {
+const RewardGallery = () => {
   const { state, dispatch } = useGameContext();
   const unlockedImages = state.unlockedImages;
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
@@ -141,4 +141,6 @@ export default function RewardGallery() {
       )}
     </>
   );
-}
+};
+
+export default RewardGallery;
