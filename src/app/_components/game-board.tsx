@@ -2,262 +2,41 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import CompletionScreen from "./completion-screen";
 import EquationDisplay from "./equation-display";
-import { ALL_REWARD_IMAGES } from "./reward-gallery";
-import { toast } from "sonner";
-
-type OperationMode = "addition" | "subtraction" | "multiplication" | "all";
+import { useGameContext } from "@/contexts/game-context";
 
 // Constants
 const CELEBRATION_DELAY = 600;
 
-type Square = {
-  id: number;
-  value: number;
-  revealed: boolean;
-};
-
 type GameBoardProps = {
-  mode: OperationMode;
-  maxNumber: number;
-  boardSize: number;
-  selectedTimesTables: number[];
-  onComplete: (completedImage: number) => void;
   onRestart: () => void;
   onExit: () => void;
-  unlockedImages: number[];
 };
 
-// Generate random number between min and max (inclusive)
-function randomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+export default function GameBoard({ onRestart, onExit }: GameBoardProps) {
+  const { state, dispatch } = useGameContext();
+  const { game } = state;
 
-// Calculate target based on operation and two values
-function calculateTarget(op: "addition" | "subtraction" | "multiplication", val1: number, val2: number): number {
-  switch (op) {
-    case "addition":
-      return val1 + val2;
-    case "subtraction":
-      // Always return positive result
-      return Math.abs(val1 - val2);
-    case "multiplication":
-      return val1 * val2;
-  }
-}
+  if (!game) return null;
 
-// Check if values match target for given operation
-function checkAnswer(
-  selectedValues: number[],
-  target: number,
-  currentOp: "addition" | "subtraction" | "multiplication",
-  multiplicationTable: number | null,
-): boolean {
-  // Multiplication mode: single square selection
-  if (currentOp === "multiplication" && multiplicationTable !== null) {
-    if (selectedValues.length !== 1) return false;
-    const val = selectedValues[0];
-    if (val === undefined) return false;
-    return val * multiplicationTable === target;
-  }
+  const { board, selectedSquares, target, currentOperation, celebratingSquares, backgroundImage, isComplete, multiplicationTable, multiplicationSwapOrder } = game;
+  const boardSize = state.config.boardSize;
 
-  // Addition/Subtraction mode: two square selection
-  if (selectedValues.length !== 2) return false;
-
-  const [val1, val2] = selectedValues;
-  if (val1 === undefined || val2 === undefined) return false;
-
-  // For subtraction, check both orderings since we always want positive results
-  if (currentOp === "subtraction") {
-    return Math.abs(val1 - val2) === target;
-  }
-
-  // For addition, order doesn't matter
-  return calculateTarget(currentOp, val1, val2) === target;
-}
-
-export default function GameBoard({
-  mode,
-  maxNumber,
-  boardSize,
-  selectedTimesTables,
-  onComplete,
-  onRestart,
-  onExit,
-  unlockedImages,
-}: GameBoardProps) {
-  const [board, setBoard] = useState<Square[]>([]);
-  const [selectedSquares, setSelectedSquares] = useState<number[]>([]);
-  const [target, setTarget] = useState<number>(0);
-  const [currentOperation, setCurrentOperation] = useState<"addition" | "subtraction" | "multiplication">("addition");
-  const [celebratingSquares, setCelebratingSquares] = useState<number[]>([]);
-  const [backgroundImage, setBackgroundImage] = useState<string>("");
-  const [backgroundImageNumber, setBackgroundImageNumber] = useState<number>(1);
-  const [isComplete, setIsComplete] = useState(false);
-  // For multiplication mode: track the times table multiplier and whether to swap display order
-  const [multiplicationTable, setMultiplicationTable] = useState<number | null>(null);
-  const [multiplicationSwapOrder, setMultiplicationSwapOrder] = useState(false);
-
-  const totalSquares = boardSize * boardSize;
-
-  // Select background image on mount - prioritize unseen images
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run once on mount to keep image stable
+  // Handle celebration animation timing - dispatch REVEAL_SQUARES after delay
   useEffect(() => {
-    const unseenImages = ALL_REWARD_IMAGES.filter((num) => !unlockedImages.includes(num));
-
-    // If there are unseen images, pick one of those. Otherwise pick random.
-    const availableImages = unseenImages.length > 0 ? unseenImages : ALL_REWARD_IMAGES;
-    const chosenNumber = availableImages[randomInt(0, availableImages.length - 1)] ?? 1;
-
-    setBackgroundImageNumber(chosenNumber);
-    setBackgroundImage(`/assets/${chosenNumber}.png`);
-  }, []); // Only run once on mount to keep image stable throughout game
-
-  // Initialize board with random numbers
-  useEffect(() => {
-    const newBoard: Square[] = [];
-    for (let i = 0; i < totalSquares; i++) {
-      newBoard.push({
-        id: i,
-        value: randomInt(1, maxNumber),
-        revealed: false,
-      });
+    if (celebratingSquares.length > 0) {
+      const timer = setTimeout(() => {
+        dispatch({ type: "REVEAL_SQUARES" });
+      }, CELEBRATION_DELAY);
+      return () => clearTimeout(timer);
     }
-    setBoard(newBoard);
-  }, [maxNumber, totalSquares]);
+  }, [celebratingSquares, dispatch]);
 
-  // Generate new target when board changes or turn completes
-  useEffect(() => {
-    if (board.length === 0) return;
-
-    const availableSquares = board.filter((sq) => !sq.revealed);
-    if (availableSquares.length === 0) {
-      setIsComplete(true);
-      onComplete(backgroundImageNumber);
-      return;
-    }
-
-    // Determine operation for this turn first
-    let operation: "addition" | "subtraction" | "multiplication";
-    if (mode === "all") {
-      // Smart operation selection for All Mixed mode
-      if (availableSquares.length === 1) {
-        // Only 1 square left - must use multiplication
-        operation = "multiplication";
-      } else if (availableSquares.length === 2) {
-        // Only 2 squares left - must use addition or subtraction (not multiplication which only clears 1)
-        const ops: ("addition" | "subtraction")[] = ["addition", "subtraction"];
-        operation = ops[randomInt(0, 1)] ?? "addition";
-      } else {
-        // 3+ squares - any operation is fine
-        const ops: ("addition" | "subtraction" | "multiplication")[] = ["addition", "subtraction", "multiplication"];
-        operation = ops[randomInt(0, 2)] ?? "addition";
-      }
-    } else {
-      operation = mode as "addition" | "subtraction" | "multiplication";
-    }
-
-    setCurrentOperation(operation);
-
-    // Handle multiplication mode differently (single square selection)
-    if (operation === "multiplication") {
-      if (selectedTimesTables.length === 0) return;
-      if (availableSquares.length === 0) return;
-
-      // Pick random square from board
-      const randomSquare = availableSquares[randomInt(0, availableSquares.length - 1)];
-      if (!randomSquare) return;
-
-      // Pick random times table
-      const randomTableIndex = randomInt(0, selectedTimesTables.length - 1);
-      const timesTable = selectedTimesTables[randomTableIndex];
-      if (!timesTable) return;
-
-      // Calculate target
-      const targetValue = randomSquare.value * timesTable;
-
-      // Randomly decide order for display
-      const swapOrder = Math.random() < 0.5;
-
-      setTarget(targetValue);
-      setMultiplicationTable(timesTable);
-      setMultiplicationSwapOrder(swapOrder);
-    } else {
-      // Addition/Subtraction mode (two square selection)
-      if (availableSquares.length < 2) return;
-
-      // Build a list of all possible targets from available squares
-      const possibleTargets: Array<{
-        target: number;
-        square1: Square;
-        square2: Square;
-      }> = [];
-
-      for (let i = 0; i < availableSquares.length; i++) {
-        for (let j = i + 1; j < availableSquares.length; j++) {
-          const sq1 = availableSquares[i];
-          const sq2 = availableSquares[j];
-          if (sq1 && sq2) {
-            const target = calculateTarget(operation, sq1.value, sq2.value);
-            possibleTargets.push({ target, square1: sq1, square2: sq2 });
-          }
-        }
-      }
-
-      if (possibleTargets.length === 0) return;
-
-      // Pick a random valid target from the possibilities
-      const chosen = possibleTargets[randomInt(0, possibleTargets.length - 1)];
-      if (!chosen) return;
-
-      setTarget(chosen.target);
-      setMultiplicationTable(null);
-    }
-  }, [board, mode, selectedTimesTables, onComplete, backgroundImageNumber]);
-
-  // Handle square click
+  // Handle square click - just dispatch to context
   const handleSquareClick = (squareId: number) => {
-    const square = board.find((sq) => sq.id === squareId);
-    if (!square || square.revealed) return;
-
-    // Toggle selection
-    if (selectedSquares.includes(squareId)) {
-      setSelectedSquares(selectedSquares.filter((id) => id !== squareId));
-    } else {
-      // Determine max selections based on operation
-      const maxSelections = currentOperation === "multiplication" ? 1 : 2;
-
-      // Only allow maxSelections at a time
-      if (selectedSquares.length < maxSelections) {
-        const newSelected = [...selectedSquares, squareId];
-        setSelectedSquares(newSelected);
-
-        // Check answer when correct number of squares are selected
-        if (newSelected.length === maxSelections) {
-          const selectedValues = newSelected
-            .map((id) => board.find((sq) => sq.id === id)?.value)
-            .filter((v): v is number => v !== undefined);
-
-          if (checkAnswer(selectedValues, target, currentOperation, multiplicationTable)) {
-            // Correct answer! Show celebration effect
-            setCelebratingSquares(newSelected);
-
-            setTimeout(() => {
-              setBoard((prev) => prev.map((sq) => (newSelected.includes(sq.id) ? { ...sq, revealed: true } : sq)));
-              setSelectedSquares([]);
-              setCelebratingSquares([]);
-            }, CELEBRATION_DELAY);
-          } else {
-            toast.error("Oops! That's not quite right 😿 Try again!");
-            setTimeout(() => {
-              setSelectedSquares([]);
-            }, CELEBRATION_DELAY);
-          }
-        }
-      }
-    }
+    dispatch({ type: "TOGGLE_SQUARE", squareId });
   };
 
   // Get selected values for display

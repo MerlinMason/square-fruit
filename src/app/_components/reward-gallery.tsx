@@ -16,18 +16,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import { useState } from "react";
-
-type RewardGalleryProps = {
-  unlockedImages: number[];
-  onResetProgress: () => void;
-};
+import { useGameContext } from "@/contexts/game-context";
 
 // Constants
 export const ALL_REWARD_IMAGES = Array.from({ length: 12 }, (_, i) => i + 1);
 const THUMBNAIL_ASPECT_RATIO = "12.8/9";
 
-export default function RewardGallery({ unlockedImages, onResetProgress }: RewardGalleryProps) {
+export default function RewardGallery() {
+  const { state, dispatch } = useGameContext();
+  const unlockedImages = state.unlockedImages;
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
+
+  const handleResetProgress = () => {
+    dispatch({ type: "RESET_PROGRESS" });
+  };
 
   return (
     <>
@@ -70,7 +72,7 @@ export default function RewardGallery({ unlockedImages, onResetProgress }: Rewar
                     Cancel
                   </AlertDialogCancel>
                   <AlertDialogAction
-                    onClick={onResetProgress}
+                    onClick={handleResetProgress}
                     className="cursor-pointer bg-gradient-to-r from-red-400 to-red-600 text-white hover:from-red-500 hover:to-red-700"
                   >
                     Reset Progress

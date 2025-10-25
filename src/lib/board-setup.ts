@@ -2,11 +2,14 @@ import type { Square } from "@/contexts/game-context";
 import { randomInt } from "./game-helpers";
 
 export const createBoard = (boardSize: number, maxNumber: number): Square[] => {
-  return Array.from({ length: boardSize * boardSize }, (_, id) => ({
+  const board = Array.from({ length: boardSize * boardSize }, (_, id) => ({
     id,
     value: randomInt(1, maxNumber),
     revealed: false,
   }));
+
+  // for complex games, sort the squares to make finding numbers easier easier
+  return boardSize > 6 && maxNumber > 12 ? board.sort((a, b) => a.value - b.value) : board;
 };
 
 export const selectBackgroundImage = (

@@ -6,27 +6,8 @@ import SectionHeading from "@/app/_components/section-heading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useLocalStorage } from "usehooks-ts";
-
-type OperationMode = "addition" | "subtraction" | "multiplication" | "all";
-
-type GameConfig = {
-  mode: OperationMode;
-  maxNumber: number;
-  boardSize: number;
-  selectedTimesTables: number[];
-};
-
-type GameState = "config" | "playing";
-
-const DEFAULT_CONFIG: GameConfig = {
-  mode: "addition",
-  maxNumber: 12,
-  boardSize: 6,
-  selectedTimesTables: [2, 5, 10],
-};
+import { useGameContext } from "@/contexts/game-context";
 
 // Constants
 const BOARD_SIZE_MIN = 4;
@@ -36,25 +17,11 @@ const NUMBER_RANGE_MIN = 1;
 const NUMBER_RANGE_MAX = 100;
 
 export default function MathGame() {
-  const [isMounted, setIsMounted] = useState(false);
-  const [gameState, setGameState] = useState<GameState>("config");
-  const [config, setConfig] = useLocalStorage<GameConfig>("square-fruit-config", DEFAULT_CONFIG);
-  const [unlockedImages, setUnlockedImages] = useLocalStorage<number[]>("square-fruit-unlocked", []);
+  const { state, dispatch } = useGameContext();
+  const { config, screen } = state;
 
-  // Ensure selectedTimesTables exists (for backwards compatibility with old localStorage)
-  useEffect(() => {
-    if (isMounted && !config.selectedTimesTables) {
-      setConfig({ ...config, selectedTimesTables: DEFAULT_CONFIG.selectedTimesTables });
-    }
-  }, [isMounted, config, setConfig]);
-
-  // Only render client-specific content after mounting
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  // Show loading state during SSR/hydration
-  if (!isMounted) {
+  // Show loading state during SSR/hydration (context handles this via useLocalStorage)
+  if (!config) {
     return (
       <div className="container mx-auto flex min-h-screen items-center justify-center p-2 sm:p-4">
         <Card className="w-full max-w-2xl bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
@@ -84,25 +51,14 @@ export default function MathGame() {
       toast.error("Please select at least one times table to practice! 🔢");
       return;
     }
-    setGameState("playing");
-  };
-
-  const handleGameComplete = (completedImage: number) => {
-    // Add the completed image to unlocked list if not already there
-    if (!unlockedImages.includes(completedImage)) {
-      setUnlockedImages([...unlockedImages, completedImage]);
-    }
+    dispatch({ type: "START_GAME" });
   };
 
   const handleRestart = () => {
-    setGameState("config");
+    dispatch({ type: "EXIT_TO_CONFIG" });
   };
 
-  const handleResetProgress = () => {
-    setUnlockedImages([]);
-  };
-
-  if (gameState === "config") {
+  if (screen === "config") {
     return (
       <div className="container mx-auto min-h-screen p-4 sm:p-4 sm:py-8">
         <div className="relative grid grid-cols-1 gap-3 sm:gap-12 lg:grid-cols-2">
@@ -125,7 +81,7 @@ export default function MathGame() {
                 <div className="grid grid-cols-2 gap-2 sm:gap-4">
                   <Button
                     variant={config.mode === "addition" ? "default" : "outline"}
-                    onClick={() => setConfig({ ...config, mode: "addition" })}
+                    onClick={() => dispatch({ type: "SET_MODE", mode: "addition" })}
                     className={`h-16 cursor-pointer font-bold text-base transition-all sm:h-20 sm:text-lg ${
                       config.mode === "addition"
                         ? "bg-gradient-to-br from-pink-400 to-pink-600 hover:from-pink-500 hover:to-pink-700"
@@ -136,7 +92,7 @@ export default function MathGame() {
                   </Button>
                   <Button
                     variant={config.mode === "subtraction" ? "default" : "outline"}
-                    onClick={() => setConfig({ ...config, mode: "subtraction" })}
+                    onClick={() => dispatch({ type: "SET_MODE", mode: "subtraction" })}
                     className={`h-16 cursor-pointer font-bold text-base transition-all sm:h-20 sm:text-lg ${
                       config.mode === "subtraction"
                         ? "bg-gradient-to-br from-purple-400 to-purple-600 hover:from-purple-500 hover:to-purple-700"
@@ -147,7 +103,7 @@ export default function MathGame() {
                   </Button>
                   <Button
                     variant={config.mode === "multiplication" ? "default" : "outline"}
-                    onClick={() => setConfig({ ...config, mode: "multiplication" })}
+                    onClick={() => dispatch({ type: "SET_MODE", mode: "multiplication" })}
                     className={`h-16 cursor-pointer font-bold text-base transition-all sm:h-20 sm:text-lg ${
                       config.mode === "multiplication"
                         ? "bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700"
@@ -158,7 +114,7 @@ export default function MathGame() {
                   </Button>
                   <Button
                     variant={config.mode === "all" ? "default" : "outline"}
-                    onClick={() => setConfig({ ...config, mode: "all" })}
+                    onClick={() => dispatch({ type: "SET_MODE", mode: "all" })}
                     className={`h-16 cursor-pointer font-bold text-base transition-all sm:h-20 sm:text-lg ${
                       config.mode === "all"
                         ? "bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 hover:from-pink-500 hover:via-purple-500 hover:to-blue-500"
@@ -186,14 +142,14 @@ export default function MathGame() {
                           onClick={() => {
                             const timesTables = config.selectedTimesTables || [];
                             if (isSelected) {
-                              setConfig({
-                                ...config,
-                                selectedTimesTables: timesTables.filter((n) => n !== num),
+                              dispatch({
+                                type: "SET_TIMES_TABLES",
+                                timesTables: timesTables.filter((n) => n !== num),
                               });
                             } else {
-                              setConfig({
-                                ...config,
-                                selectedTimesTables: [...timesTables, num].sort((a, b) => a - b),
+                              dispatch({
+                                type: "SET_TIMES_TABLES",
+                                timesTables: [...timesTables, num].sort((a, b) => a - b),
                               });
                             }
                           }}
@@ -232,8 +188,8 @@ export default function MathGame() {
                     const size = value[0] ?? BOARD_SIZE_MIN;
                     // Ensure even number of squares by using even board sizes only
                     const evenSize = size % 2 === 0 ? size : size + 1;
-                    setConfig({
-                      ...config,
+                    dispatch({
+                      type: "SET_BOARD_SIZE",
                       boardSize: Math.min(evenSize, BOARD_SIZE_MAX),
                     });
                   }}
@@ -258,9 +214,9 @@ export default function MathGame() {
                 <Slider
                   value={[config.maxNumber]}
                   onValueChange={(value) =>
-                    setConfig({
-                      ...config,
-                      maxNumber: value[0] ?? DEFAULT_CONFIG.maxNumber,
+                    dispatch({
+                      type: "SET_MAX_NUMBER",
+                      maxNumber: value[0] ?? 12,
                     })
                   }
                   min={NUMBER_RANGE_MIN}
@@ -287,25 +243,14 @@ export default function MathGame() {
           </Card>
 
           {/* Reward Gallery */}
-          <RewardGallery unlockedImages={unlockedImages} onResetProgress={handleResetProgress} />
+          <RewardGallery />
         </div>
       </div>
     );
   }
 
-  if (gameState === "playing") {
-    return (
-      <GameBoard
-        mode={config.mode}
-        maxNumber={config.maxNumber}
-        boardSize={config.boardSize}
-        selectedTimesTables={config.selectedTimesTables || DEFAULT_CONFIG.selectedTimesTables}
-        onComplete={handleGameComplete}
-        onRestart={handleRestart}
-        onExit={() => setGameState("config")}
-        unlockedImages={unlockedImages}
-      />
-    );
+  if (screen === "playing") {
+    return <GameBoard onRestart={handleRestart} onExit={() => dispatch({ type: "EXIT_TO_CONFIG" })} />;
   }
 
   return null;
