@@ -15,10 +15,10 @@ export default function CompletionScreen({ onRestart }: CompletionScreenProps) {
       </div>
       <div className="flex justify-center gap-2 text-3xl sm:text-4xl">
         <span className="animate-bounce">⭐</span>
-        <span className="animation-delay-200 animate-bounce">✨</span>
-        <span className="animation-delay-400 animate-bounce">🌟</span>
-        <span className="animation-delay-600 animate-bounce">💖</span>
-        <span className="animation-delay-800 animate-bounce">🦄</span>
+        <span className="animate-bounce delay-[200ms]">✨</span>
+        <span className="animate-bounce delay-[400ms]">🌟</span>
+        <span className="animate-bounce delay-[600ms]">💖</span>
+        <span className="animate-bounce delay-[800ms]">🦄</span>
       </div>
       <p className="font-bold text-purple-600 text-xl sm:text-2xl">🌈 Amazing work! 🌈</p>
       <Button
