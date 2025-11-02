@@ -1,4 +1,4 @@
-import MathGame from "@/app/_components/math-game";
+import { MathGame } from "@/app/_components/math-game";
 import { GameProvider } from "@/contexts/game-context";
 
 const Home = () => {

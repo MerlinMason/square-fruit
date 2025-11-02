@@ -8,7 +8,7 @@ const operationSymbol = {
   multiplication: "✖️",
 };
 
-const EquationDisplay = () => {
+export const EquationDisplay = () => {
   const { state } = useGameContext();
   const { game } = state;
 
@@ -130,5 +130,3 @@ const EquationDisplay = () => {
     </>
   );
 };
-
-export default EquationDisplay;

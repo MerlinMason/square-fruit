@@ -1,6 +1,6 @@
 "use client";
 
-import SectionHeading from "@/app/_components/section-heading";
+import { SectionHeading } from "@/app/_components/section-heading";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +22,7 @@ import { useState } from "react";
 export const ALL_REWARD_IMAGES = Array.from({ length: 12 }, (_, i) => i + 1);
 const THUMBNAIL_ASPECT_RATIO = "12.8/9";
 
-const RewardGallery = () => {
+export const RewardGallery = () => {
   const { state, dispatch } = useGameContext();
   const unlockedImages = state.unlockedImages;
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
@@ -142,5 +142,3 @@ const RewardGallery = () => {
     </>
   );
 };
-
-export default RewardGallery;

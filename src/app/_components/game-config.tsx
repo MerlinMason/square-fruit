@@ -1,6 +1,6 @@
 "use client";
 
-import SectionHeading from "@/app/_components/section-heading";
+import { SectionHeading } from "@/app/_components/section-heading";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -14,7 +14,7 @@ import {
 } from "@/contexts/game-context";
 import { toast } from "sonner";
 
-const GameConfig = () => {
+export const GameConfig = () => {
   const { state, dispatch } = useGameContext();
   const { config } = state;
 
@@ -196,5 +196,3 @@ const GameConfig = () => {
     </>
   );
 };
-
-export default GameConfig;

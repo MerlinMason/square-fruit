@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useGameContext } from "@/contexts/game-context";
 
-const CompletionScreen = () => {
+export const CompletionScreen = () => {
   const { dispatch } = useGameContext();
   return (
     <div className="space-y-3 sm:space-y-4">
@@ -31,5 +31,3 @@ const CompletionScreen = () => {
     </div>
   );
 };
-
-export default CompletionScreen;

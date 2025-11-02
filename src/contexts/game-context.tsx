@@ -1,8 +1,7 @@
 "use client";
 
-import { checkAnswer } from "@/lib/answer-validation";
-import { createBoard, selectBackgroundImage } from "@/lib/board-setup";
-import { generateTarget } from "@/lib/target-generation";
+import { checkAnswer, createBoard, generateTarget } from "@/lib/game-helpers";
+import { selectBackgroundImage } from "@/lib/reward-helpers";
 import { type ReactNode, createContext, useContext, useEffect, useReducer, useState } from "react";
 import { toast } from "sonner";
 import { useLocalStorage } from "usehooks-ts";
@@ -70,9 +69,10 @@ type GameAction =
 export const BOARD_SIZE_MIN = 4;
 export const BOARD_SIZE_MAX = 10;
 export const BOARD_SIZE_STEP = 2;
-export const NUMBER_RANGE_MIN = 1;
+export const NUMBER_RANGE_MIN = 2;
 export const NUMBER_RANGE_MAX = 100;
 export const TIMES_TABLES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+export const CELEBRATION_DELAY = 600;
 
 export const DEFAULT_CONFIG: GameConfig = {
   mode: "addition",

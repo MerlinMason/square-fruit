@@ -2,23 +2,20 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useGameContext } from "@/contexts/game-context";
+import { CELEBRATION_DELAY, useGameContext } from "@/contexts/game-context";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
-import CompletionScreen from "./completion-screen";
-import EquationDisplay from "./equation-display";
+import { CompletionScreen } from "./completion-screen";
+import { EquationDisplay } from "./equation-display";
 
-// Constants
-const CELEBRATION_DELAY = 600;
-
-const GameBoard = () => {
+export const GameBoard = () => {
   const { state, dispatch } = useGameContext();
-  const { game } = state;
+  const { game, config } = state;
 
   if (!game) return null;
 
   const { board, selectedSquares, celebratingSquares, backgroundImage, isComplete } = game;
-  const boardSize = state.config.boardSize;
+  const boardSize = config.boardSize;
 
   // Handle celebration animation timing - dispatch REVEAL_SQUARES after delay
   useEffect(() => {
@@ -29,11 +26,6 @@ const GameBoard = () => {
       return () => clearTimeout(timer);
     }
   }, [celebratingSquares, dispatch]);
-
-  // Handle square click - just dispatch to context
-  const handleSquareClick = (squareId: number) => {
-    dispatch({ type: "TOGGLE_SQUARE", squareId });
-  };
 
   return (
     <div className="container mx-auto flex flex-col gap-4 p-4 md:flex-row md:items-start md:gap-6 md:p-8">
@@ -47,7 +39,7 @@ const GameBoard = () => {
             {/* Header with Logo and Title */}
             <div className="mb-3 flex flex-wrap items-center justify-center gap-2 sm:mb-4 sm:gap-4">
               <img src="/assets/logo.webp" alt="Square Fruit Logo" className="h-12 w-auto sm:h-16" />
-              <div className=" font-bold text-2xl text-pink-700/60 sm:text-4xl">Square Fruit</div>
+              <div className="font-bold text-2xl text-pink-700/60 sm:text-4xl">Square Fruit</div>
               <Button
                 onClick={() => dispatch({ type: "EXIT_TO_CONFIG" })}
                 variant="outline"
@@ -87,7 +79,7 @@ const GameBoard = () => {
             return (
               <button
                 key={square.id}
-                onClick={() => handleSquareClick(square.id)}
+                onClick={() => dispatch({ type: "TOGGLE_SQUARE", squareId: square.id })}
                 disabled={square.revealed}
                 className={cn(
                   "relative aspect-square select-none rounded-md font-black text-lg transition-all duration-300 sm:text-xl lg:text-2xl",
@@ -122,5 +114,3 @@ const GameBoard = () => {
     </div>
   );
 };
-
-export default GameBoard;
